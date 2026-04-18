@@ -1,18 +1,21 @@
-<<<<<<< HEAD
+
 //
 //  NotificationsView.swift
 //  HabitTracker
 //
-=======
+
 // NotificationsView.swift
->>>>>>> f49632d1e052debed37595ee644f310e3586b471
+// f49632d1e052debed37595ee644f310e3586b471
 
 import SwiftUI
 
 struct NotificationsView: View {
-<<<<<<< HEAD
+
     @EnvironmentObject private var habitManager: HabitManager
     @EnvironmentObject private var notificationManager: NotificationManager
+    
+    @State private var notifications: [String] = []
+    @State private var newNotification: String = ""
     
     var body: some View {
         ZStack {
@@ -81,45 +84,7 @@ struct NotificationsView: View {
             .environmentObject(NotificationManager())
     }
 }
-=======
-    @State private var notifications: [String] = []
-    @State private var newNotification: String = ""
 
-    var body: some View {
-        NavigationView {
-            VStack {
-                List {
-                    ForEach(notifications, id: \ .self) { notification in
-                        Text(notification)
-                    }
-                }
-                .navigationTitle("Notifications")
-                .navigationBarTitleDisplayMode(.inline)
 
-                HStack {
-                    TextField("New Notification", text: $newNotification)
-                    Button(action: {
-                        if !newNotification.isEmpty {
-                            addNotification(newNotification)
-                            newNotification = ""
-                        }
-                    }) {
-                        Text("Add")
-                    }
-                }
-                .padding()
-            }
-        }
-    }
 
-    private func addNotification(_ notification: String) {
-        notifications.append(notification)
-    }
-}
-
-struct NotificationsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NotificationsView()
-    }
-}
->>>>>>> f49632d1e052debed37595ee644f310e3586b471
+// f49632d1e052debed37595ee644f310e3586b471
