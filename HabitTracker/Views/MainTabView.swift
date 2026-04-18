@@ -9,48 +9,62 @@ import SwiftUI
 import UIKit
 
 struct MainTabView: View {
+    @EnvironmentObject private var notificationManager: NotificationManager
+    
     @StateObject private var habitManager = HabitManager()
     @State private var selectedTab = 0
+    @State private var openedFromHome = false
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            // Ana Sayfa
-            HomeView()
-                .environmentObject(habitManager)
-                .tabItem {
-                    Label("Ana Sayfa", systemImage: "house.fill")
-                }
-                .tag(0)
+            NavigationStack {
+                HomeView(selectedTab: $selectedTab, openedFromHome: $openedFromHome)
+                    .environmentObject(habitManager)
+            }
+            .tabItem {
+                Label("Home", systemImage: "house.fill")
+            }
+            .tag(0)
             
-            // İstatistikler
             StatsView(habits: habitManager.habits)
                 .tabItem {
-                    Label("İstatistikler", systemImage: "chart.bar.xaxis")
+                    Label("Statistics", systemImage: "chart.bar.xaxis")
                 }
                 .tag(1)
             
-            // Ayarlar
-            SettingsView()
-                .tabItem {
-                    Label("Ayarlar", systemImage: "gearshape.fill")
-                }
-                .tag(2)
+            NavigationStack {
+                SettingsView(selectedTab: $selectedTab, openedFromHome: $openedFromHome)
+                    .environmentObject(habitManager)
+            }
+            .tabItem {
+                Label("Settings", systemImage: "gearshape.fill")
+            }
+            .tag(2)
         }
+        .environmentObject(habitManager)
+        .environmentObject(notificationManager)
         .accentColor(Color(red: 0.95, green: 0.7, blue: 0.5))
+        .onChange(of: selectedTab) { _, newValue in
+            if newValue != 2 {
+                openedFromHome = false
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .habitsDidChange)) { _ in
+            notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
+        }
         .onAppear {
-            // TabBar arka planını blur efekti ile özelleştir
+            notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
+            
             let appearance = UITabBarAppearance()
             appearance.configureWithOpaqueBackground()
             appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
             appearance.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.8)
             
-            // Seçili olmayan ikonlar için gri renk
             appearance.stackedLayoutAppearance.normal.iconColor = UIColor.secondaryLabel
             appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
                 .foregroundColor: UIColor.secondaryLabel
             ]
             
-            // Seçili ikonlar için ana renk
             appearance.stackedLayoutAppearance.selected.iconColor = UIColor(
                 red: 0.95,
                 green: 0.7,
@@ -76,4 +90,8 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
+        .environmentObject(AppStateManager())
+        .environmentObject(AuthManager())
+        .environmentObject(ThemeManager())
+        .environmentObject(NotificationManager())
 }

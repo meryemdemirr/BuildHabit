@@ -8,64 +8,55 @@
 import SwiftUI
 import UIKit
 
-// MARK: - Ana İstatistik Görünümü (Matris / Heatmap)
+// MARK: - Ana istatistik görünümü (aylık kompakt ızgara)
 
 struct StatsView: View {
     let habits: [Habit]
     
-    /// Matris için gösterilecek günler: Haftalık/Aylık alışkanlıklar planlanan günleri; Sıklık Yok için tamamlanan günler. Hepsi yoksa son 28 gün.
-    private var matrixDays: [Date] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        var allDays = Set<Date>()
-        
-        for habit in habits {
-            switch habit.frequency {
-            case .none:
-                for d in habit.completionDates {
-                    allDays.insert(calendar.startOfDay(for: d))
-                }
-            case .daily, .weekly, .monthly:
-                for d in habit.scheduledDates {
-                    allDays.insert(calendar.startOfDay(for: d))
-                }
-                let created = calendar.startOfDay(for: habit.createdAt ?? today)
-                for offset in 0..<60 {
-                    guard let date = calendar.date(byAdding: .day, value: -offset, to: today),
-                          date >= created else { continue }
-                    allDays.insert(date)
-                }
-            }
-        }
-        
-        let from = calendar.date(byAdding: .day, value: -60, to: today)!
-        let sorted = allDays.filter { $0 >= from && $0 <= today }.sorted()
-        if sorted.isEmpty {
-            return (0..<28).compactMap { calendar.date(byAdding: .day, value: -27 + $0, to: today) }
-        }
-        return sorted
-    }
+    @State private var monthDisplayed: Date = Calendar.current.date(
+        from: Calendar.current.dateComponents([.year, .month], from: Date())
+    )!
+    @State private var selectedHabitDay: HabitDaySelection?
+    
+    private static let weekdaySymbols = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"]
     
     var body: some View {
         NavigationView {
             ZStack {
-                Color(.systemBackground)
+                Color(.systemGroupedBackground)
                     .ignoresSafeArea()
                 
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 20) {
                         headerSection
                         
                         if habits.isEmpty {
                             emptyState
                         } else {
-                            HabitMatrixHeatmap(habits: habits, matrixDays: matrixDays)
+                            monthNavigationBar
+                            
+                            LazyVStack(alignment: .leading, spacing: 20) {
+                                ForEach(habits) { habit in
+                                    MonthlyHabitContributionCard(
+                                        habit: habit,
+                                        monthStart: monthDisplayed,
+                                        weekdaySymbols: Self.weekdaySymbols
+                                    ) { date in
+                                        guard habit.isTracked(on: date) else { return }
+                                        selectedHabitDay = HabitDaySelection(habit: habit, date: date)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 16)
                         }
                     }
                     .padding(.bottom, 100)
                 }
             }
             .navigationBarHidden(true)
+        }
+        .sheet(item: $selectedHabitDay) { selection in
+            HabitDayDetailSheet(selection: selection)
         }
     }
     
@@ -75,13 +66,67 @@ struct StatsView: View {
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundColor(Color(.label))
             
-            Text("Alışkanlık performansınızı takip edin")
-                .font(.system(size: 16, weight: .regular, design: .rounded))
+            Text("Aylık tamamlanma özeti — GitHub katkı grafiği tarzı")
+                .font(.system(size: 15, weight: .regular, design: .rounded))
                 .foregroundColor(Color(.secondaryLabel))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
         .padding(.top, 20)
+    }
+    
+    private var monthNavigationBar: some View {
+        let calendar = Calendar.current
+        let title = monthNavigationTitle(for: monthDisplayed)
+        
+        return HStack(spacing: 16) {
+            Button {
+                shiftMonth(by: -1, calendar: calendar)
+            } label: {
+                Image(systemName: "chevron.left.circle.fill")
+                    .font(.system(size: 28))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(Color(.secondaryLabel))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Önceki ay")
+            
+            Spacer(minLength: 0)
+            
+            Text(title)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundColor(Color(.label))
+                .multilineTextAlignment(.center)
+            
+            Spacer(minLength: 0)
+            
+            Button {
+                shiftMonth(by: 1, calendar: calendar)
+            } label: {
+                Image(systemName: "chevron.right.circle.fill")
+                    .font(.system(size: 28))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(Color(.secondaryLabel))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Sonraki ay")
+        }
+        .padding(.horizontal, 20)
+    }
+    
+    private func monthNavigationTitle(for monthStart: Date) -> String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "tr_TR")
+        f.dateFormat = "LLLL yyyy"
+        return f.string(from: monthStart).capitalized(with: f.locale)
+    }
+    
+    private func shiftMonth(by delta: Int, calendar: Calendar) {
+        guard let next = calendar.date(byAdding: .month, value: delta, to: monthDisplayed) else { return }
+        let comps = calendar.dateComponents([.year, .month], from: next)
+        if let start = calendar.date(from: comps) {
+            monthDisplayed = start
+        }
     }
     
     private var emptyState: some View {
@@ -105,153 +150,220 @@ struct StatsView: View {
     }
 }
 
-// MARK: - Matris / Heatmap Bileşeni (Sticky sol sütun + yatay kaydırılabilir günler)
+// MARK: - Aylık ızgara kartı (LazyVGrid)
 
-struct HabitMatrixHeatmap: View {
-    let habits: [Habit]
-    let matrixDays: [Date]
+private struct MonthlyHabitContributionCard: View {
+    let habit: Habit
+    let monthStart: Date
+    let weekdaySymbols: [String]
+    let onCellTap: (Date) -> Void
     
-    private let rowHeight: CGFloat = 52
-    private let cellSize: CGFloat = 36
-    private let habitColumnWidth: CGFloat = 140
-    private let dayColumnWidth: CGFloat = 40
-    private let gridLineWidth: CGFloat = 0.5
+    private let calendar = Calendar.current
+    private let columnSpacing: CGFloat = 3
+    private let cellCorner: CGFloat = 6
     
-    private static let dayLabels = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"]
-    
-    private func dayLabel(for date: Date) -> String {
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date)
-        let idx = (weekday + 5) % 7
-        return Self.dayLabels[idx]
+    private var gridColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: columnSpacing), count: 7)
     }
     
-    private func dayNumber(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d"
-        return formatter.string(from: date)
+    private var daysInMonth: Int {
+        calendar.range(of: .day, in: .month, for: monthStart)?.count ?? 30
+    }
+    
+    /// Ayın 1. günü Pazartesi tabanlı ızgarada kaç boş hücre (Pzt öncesi).
+    private var leadingEmptyCells: Int {
+        let first = calendar.date(from: calendar.dateComponents([.year, .month], from: monthStart))!
+        let weekday = calendar.component(.weekday, from: first)
+        return (weekday + 5) % 7
+    }
+    
+    private var gridCellCount: Int {
+        let used = leadingEmptyCells + daysInMonth
+        let remainder = used % 7
+        return remainder == 0 ? used : used + (7 - remainder)
+    }
+    
+    private func dateForDayNumber(_ day: Int) -> Date? {
+        var comps = calendar.dateComponents([.year, .month], from: monthStart)
+        comps.day = day
+        comps.hour = 0
+        comps.minute = 0
+        comps.second = 0
+        return calendar.date(from: comps)
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Performans Matrisi")
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundColor(Color(.label))
-                .padding(.horizontal, 20)
-                .padding(.bottom, 16)
-            
-            // Sticky sol sütun (alışkanlık isimleri) + tek yatay ScrollView (günler başlığı ve tüm satırlar birlikte kayar)
-            HStack(alignment: .top, spacing: 0) {
-                // Sol sabit sütun: başlık boşluğu + her alışkanlık adı/ikonu
-                VStack(alignment: .leading, spacing: 0) {
-                    Color.clear
-                        .frame(width: habitColumnWidth - 20, height: 44)
-                    ForEach(habits) { habit in
-                        HStack(spacing: 10) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(habit.swiftUIColor.opacity(0.25))
-                                    .frame(width: 36, height: 36)
-                                Image(systemName: habit.icon)
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(habit.swiftUIColor)
-                            }
-                            Text(habit.title)
-                                .font(.system(size: 14, weight: .medium, design: .rounded))
-                                .foregroundColor(Color(.label))
-                                .lineLimit(1)
-                        }
-                        .frame(width: habitColumnWidth - 20, height: rowHeight, alignment: .leading)
-                        .padding(.leading, 20)
-                    }
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(habit.swiftUIColor.opacity(0.22))
+                        .frame(width: 34, height: 34)
+                    Image(systemName: habit.icon)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(habit.swiftUIColor)
                 }
-                .frame(width: habitColumnWidth)
-                .background(Color(.systemBackground))
                 
-                // Yatay kaydırılabilir alan: gün başlıkları + tüm satırlar tek ScrollView'da (senkron kaydırma)
-                ScrollView(.horizontal, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        // Gün başlıkları
-                        HStack(spacing: 4) {
-                            ForEach(matrixDays, id: \.self) { date in
-                                VStack(spacing: 2) {
-                                    Text(dayLabel(for: date))
-                                        .font(.system(size: 9, weight: .medium, design: .rounded))
-                                        .foregroundColor(Color(.secondaryLabel))
-                                    Text(dayNumber(for: date))
-                                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(.label))
-                                }
-                                .frame(width: dayColumnWidth, height: 44)
-                            }
-                        }
-                        .padding(.horizontal, 12)
-                        
-                        Divider()
-                            .background(Color(.separator).opacity(0.6))
-                        
-                        // Satırlar
-                        ForEach(habits) { habit in
-                            HStack(spacing: 4) {
-                                ForEach(matrixDays, id: \.self) { date in
-                                    MatrixCell(
-                                        habit: habit,
-                                        date: date,
-                                        cellSize: cellSize,
-                                        isCompleted: habit.isCompleted(on: date)
-                                    )
-                                }
-                            }
-                            .padding(.horizontal, 12)
-                            .frame(height: rowHeight)
-                            
-                            Divider()
-                                .background(Color(.separator).opacity(0.4))
-                        }
-                    }
+                Text(habit.title)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color(.label))
+                    .lineLimit(2)
+                
+                Spacer(minLength: 0)
+            }
+            
+            LazyVGrid(columns: gridColumns, spacing: columnSpacing) {
+                ForEach(0..<7, id: \.self) { i in
+                    Text(weekdaySymbols[i])
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(.tertiaryLabel))
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 2)
                 }
-                .background(Color(.systemBackground))
+            }
+            
+            LazyVGrid(columns: gridColumns, spacing: columnSpacing) {
+                ForEach(0..<gridCellCount, id: \.self) { index in
+                    monthCell(at: index)
+                }
             }
         }
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color(.separator).opacity(0.5), lineWidth: gridLineWidth)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(.secondarySystemGroupedBackground))
         )
-        .padding(.horizontal, 20)
+    }
+    
+    @ViewBuilder
+    private func monthCell(at index: Int) -> some View {
+        if index < leadingEmptyCells || index >= leadingEmptyCells + daysInMonth {
+            Color.clear
+                .aspectRatio(1, contentMode: .fit)
+        } else {
+            let day = index - leadingEmptyCells + 1
+            if let date = dateForDayNumber(day) {
+                let tracked = habit.isTracked(on: date)
+                let done = habit.isCompleted(on: date)
+                ContributionDayCell(
+                    dayNumber: day,
+                    tracked: tracked,
+                    completed: done,
+                    habitColor: habit.swiftUIColor,
+                    cornerRadius: cellCorner
+                )
+                .aspectRatio(1, contentMode: .fit)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if tracked {
+                        onCellTap(date)
+                    }
+                }
+            } else {
+                Color.clear.aspectRatio(1, contentMode: .fit)
+            }
+        }
     }
 }
 
-// MARK: - Tek hücre (dolu = alışkanlık rengi, boş = ince gri çerçeve)
+// MARK: - Tek gün kutusu
 
-struct MatrixCell: View {
-    let habit: Habit
-    let date: Date
-    let cellSize: CGFloat
-    let isCompleted: Bool
+private struct ContributionDayCell: View {
+    let dayNumber: Int
+    let tracked: Bool
+    let completed: Bool
+    let habitColor: Color
+    let cornerRadius: CGFloat
     
     var body: some View {
         ZStack {
-            if isCompleted {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(habit.swiftUIColor.opacity(0.85))
-                    .frame(width: cellSize, height: cellSize - 4)
+            if !tracked {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color(.tertiarySystemFill).opacity(0.45))
+            } else if completed {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(habitColor.opacity(0.92))
             } else {
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(.systemGray4).opacity(0.6), lineWidth: 0.8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(.systemGray6).opacity(0.3))
-                    )
-                    .frame(width: cellSize, height: cellSize - 4)
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color(.systemGray5))
             }
+            
+            Text("\(dayNumber)")
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(foregroundForLabel)
         }
-        .frame(width: cellSize, height: cellSize - 4)
+    }
+    
+    private var foregroundForLabel: Color {
+        if !tracked { return Color(.tertiaryLabel) }
+        if completed { return Color.white.opacity(0.95) }
+        return Color(.secondaryLabel)
     }
 }
 
-// MARK: - Özet kutuları (isteğe bağlı, eski tasarımdan)
+// MARK: - Gün detayı (bonus)
+
+struct HabitDaySelection: Identifiable {
+    let habit: Habit
+    let date: Date
+    var id: String { "\(habit.id.uuidString)-\(Calendar.current.startOfDay(for: date).timeIntervalSince1970)" }
+}
+
+private struct HabitDayDetailSheet: View {
+    let selection: HabitDaySelection
+    @Environment(\.dismiss) private var dismiss
+    
+    private var dateText: String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "tr_TR")
+        f.dateStyle = .full
+        f.timeStyle = .none
+        return f.string(from: selection.date)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(selection.habit.swiftUIColor.opacity(0.25))
+                            .frame(width: 44, height: 44)
+                        Image(systemName: selection.habit.icon)
+                            .foregroundStyle(selection.habit.swiftUIColor)
+                    }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(selection.habit.title)
+                            .font(.headline)
+                        Text(dateText)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                
+                Label(
+                    selection.habit.isCompleted(on: selection.date) ? "Bu gün tamamlandı" : "Bu gün tamamlanmadı",
+                    systemImage: selection.habit.isCompleted(on: selection.date) ? "checkmark.circle.fill" : "circle"
+                )
+                .font(.body.weight(.medium))
+                .foregroundStyle(selection.habit.isCompleted(on: selection.date) ? Color.green : Color.secondary)
+                
+                Spacer(minLength: 0)
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .navigationTitle("Gün özeti")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Tamam") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Özet kutusu (eski tasarım; istenirse kullanılır)
 
 struct StatBox: View {
     let title: String
@@ -295,7 +407,7 @@ struct StatBox: View {
         Habit(title: "Sabah Egzersizi", icon: "figure.run", color: Color(red: 1.0, green: 0.7, blue: 0.5), streak: 5, frequency: .weekly),
         Habit(title: "Kitap Okuma", icon: "book.fill", color: Color(red: 0.7, green: 0.5, blue: 1.0), streak: 3, frequency: .daily)
     ]
-    habits[0].scheduledDates = (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: calendar.date(byAdding: .day, value: -7, to: today)!) }
+    habits[0].scheduledDates = (0..<20).compactMap { calendar.date(byAdding: .day, value: $0 - 10, to: today) }
     habits[1].completionDates = [today, calendar.date(byAdding: .day, value: -1, to: today)!]
     return StatsView(habits: habits)
 }

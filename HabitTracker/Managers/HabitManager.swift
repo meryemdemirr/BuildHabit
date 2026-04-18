@@ -137,6 +137,7 @@ class HabitManager: ObservableObject {
         if let encoded = try? JSONEncoder().encode(habits) {
             UserDefaults.standard.set(encoded, forKey: habitsKey)
         }
+        NotificationCenter.default.post(name: .habitsDidChange, object: nil)
     }
     
     // Yükle

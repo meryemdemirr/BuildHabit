@@ -50,6 +50,20 @@ struct Habit: Identifiable, Codable {
             calendar.isDate(completionDate, inSameDayAs: normalizedDate)
         }
     }
+    
+    /// `HabitManager.habitsForDate` ile aynı kurallar: o gün bu alışkanlık takvimde yer alıyor mu.
+    func isTracked(on date: Date) -> Bool {
+        let calendar = Calendar.current
+        let normalizedDate = calendar.startOfDay(for: date)
+        let habitStart = calendar.startOfDay(for: createdAt ?? Date())
+        guard habitStart <= normalizedDate else { return false }
+        if frequency == .daily {
+            return calendar.isDate(habitStart, inSameDayAs: normalizedDate)
+        }
+        return scheduledDates.contains { scheduledDate in
+            calendar.isDate(scheduledDate, inSameDayAs: normalizedDate)
+        }
+    }
 }
 
 // Color'ı Codable yapmak için wrapper

@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Binding var selectedTab: Int
+    @Binding var openedFromHome: Bool
+    
     @EnvironmentObject var habitManager: HabitManager
     @State private var showAddHabitSheet = false
-    @State private var showSettings = false
     @State private var selectedDate = Date()
     
     private var isPastDate: Bool {
@@ -37,8 +39,7 @@ struct HomeView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
                 // Sistem arka plan rengi (Light/Dark mode uyumlu)
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
@@ -60,10 +61,10 @@ struct HomeView: View {
                                 
                                 Spacer()
                                 
-                                // Profile icon - Settings'e yönlendir
-                                Button(action: {
-                                    showSettings = true
-                                }) {
+                                Button {
+                                    openedFromHome = true
+                                    selectedTab = 2
+                                } label: {
                                     ZStack {
                                         Circle()
                                             .fill(
@@ -78,11 +79,13 @@ struct HomeView: View {
                                             )
                                             .frame(width: 48, height: 48)
                                         
-                                        Image(systemName: "person.fill")
+                                        Image(systemName: "person.crop.circle.fill")
                                             .foregroundColor(.white)
-                                            .font(.system(size: 18, weight: .medium))
+                                            .font(.system(size: 22, weight: .medium))
                                     }
                                 }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel("Open settings")
                             }
                             .padding(.horizontal, 20)
                             .padding(.top, 20)
@@ -209,14 +212,16 @@ struct HomeView: View {
                 AddHabitSheet()
                     .environmentObject(habitManager)
             }
-            .fullScreenCover(isPresented: $showSettings) {
-                SettingsView()
-            }
         }
     }
-}
+
 
 #Preview {
-    HomeView()
-        .environmentObject(HabitManager())
+    @Previewable @State var selectedTab = 0
+    @Previewable @State var openedFromHome = false
+    
+    NavigationStack {
+        HomeView(selectedTab: $selectedTab, openedFromHome: $openedFromHome)
+            .environmentObject(HabitManager())
+    }
 }

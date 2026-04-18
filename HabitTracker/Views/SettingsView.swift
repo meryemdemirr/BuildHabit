@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Binding var selectedTab: Int
+    @Binding var openedFromHome: Bool
+    
     @EnvironmentObject var appState: AppStateManager
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var themeManager: ThemeManager
@@ -15,8 +18,7 @@ struct SettingsView: View {
     @State private var showSignOutAlert = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
                 // Sistem arka plan rengi
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
@@ -74,12 +76,18 @@ struct SettingsView: View {
                     
                     // Uygulama Ayarları
                     Section {
-                        SettingsRow(
-                            icon: "bell.fill",
-                            iconColor: Color(red: 1.0, green: 0.6, blue: 0.4),
-                            title: "Bildirimler",
-                            subtitle: "Hatırlatmaları yönet"
-                        )
+                        NavigationLink {
+                            NotificationsView()
+                        } label: {
+                            SettingsRow(
+                                icon: "bell.fill",
+                                iconColor: Color(red: 1.0, green: 0.6, blue: 0.4),
+                                title: "Bildirimler",
+                                subtitle: "Hatırlatmaları yönet",
+                                showsDisclosure: false
+                            )
+                        }
+                        .buttonStyle(.plain)
                         
                         // Tema Seçici
                         VStack(alignment: .leading, spacing: 8) {
@@ -183,21 +191,39 @@ struct SettingsView: View {
                     }
                 }
                 .scrollContentBackground(.hidden)
-            }
-            .navigationTitle("Ayarlar")
-            .navigationBarTitleDisplayMode(.large)
-            .sheet(isPresented: $showProfile) {
-                ProfileView()
-                    .environmentObject(authManager)
-            }
-            .alert("Çıkış Yap", isPresented: $showSignOutAlert) {
-                Button("İptal", role: .cancel) { }
-                Button("Çıkış Yap", role: .destructive) {
-                    authManager.signOut()
+        }
+        .navigationTitle("Ayarlar")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            if openedFromHome {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        selectedTab = 0
+                        openedFromHome = false
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 17, weight: .semibold))
+                            Text("Home")
+                                .font(.system(size: 17, weight: .regular))
+                        }
+                        .foregroundStyle(Color(.label))
+                    }
+                    .accessibilityLabel("Back to Home")
                 }
-            } message: {
-                Text("Hesabınızdan çıkmak istediğinize emin misiniz?")
             }
+        }
+        .sheet(isPresented: $showProfile) {
+            ProfileView()
+                .environmentObject(authManager)
+        }
+        .alert("Çıkış Yap", isPresented: $showSignOutAlert) {
+            Button("İptal", role: .cancel) { }
+            Button("Çıkış Yap", role: .destructive) {
+                authManager.signOut()
+            }
+        } message: {
+            Text("Hesabınızdan çıkmak istediğinize emin misiniz?")
         }
     }
 }
@@ -207,6 +233,8 @@ struct SettingsRow: View {
     let iconColor: Color
     let title: String
     let subtitle: String
+    /// `NavigationLink` kendi okunu gösterir; `false` yaparak çift ok önlenir.
+    var showsDisclosure: Bool = true
     
     var body: some View {
         HStack(spacing: 16) {
@@ -230,11 +258,13 @@ struct SettingsRow: View {
                     .foregroundColor(Color(.secondaryLabel))
             }
             
-            Spacer()
+            Spacer(minLength: 0)
             
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(Color(.tertiaryLabel))
+            if showsDisclosure {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Color(.tertiaryLabel))
+            }
         }
         .padding(.vertical, 4)
     }
@@ -300,8 +330,15 @@ struct ProfileView: View {
 }
 
 #Preview {
-    SettingsView()
-        .environmentObject(AppStateManager())
-        .environmentObject(AuthManager())
-        .environmentObject(ThemeManager())
+    @Previewable @State var selectedTab = 2
+    @Previewable @State var openedFromHome = true
+    
+    NavigationStack {
+        SettingsView(selectedTab: $selectedTab, openedFromHome: $openedFromHome)
+            .environmentObject(AppStateManager())
+            .environmentObject(AuthManager())
+            .environmentObject(ThemeManager())
+            .environmentObject(HabitManager())
+            .environmentObject(NotificationManager())
+    }
 }

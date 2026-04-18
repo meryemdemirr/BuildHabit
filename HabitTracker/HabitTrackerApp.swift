@@ -13,6 +13,7 @@ struct HabitTrackerApp: App {
     @StateObject private var appState = AppStateManager()
     @StateObject private var authManager = AuthManager()
     @StateObject private var themeManager = ThemeManager()
+    @StateObject private var notificationManager = NotificationManager()
     
     init() {
         // Firebase yapılandırmasını başlat
@@ -25,6 +26,7 @@ struct HabitTrackerApp: App {
                 .environmentObject(appState)
                 .environmentObject(authManager)
                 .environmentObject(themeManager)
+                .environmentObject(notificationManager)
                 .preferredColorScheme(themeManager.colorScheme)
         }
     }
