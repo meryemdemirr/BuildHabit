@@ -125,6 +125,16 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [Self.eveningReminderIdentifier])
     }
     
+    /// Bekleyen akşam hatırlatıcısını iptal eder ve yerel bildirim tercihlerini sıfırlar (tam veri sıfırlaması için).
+    func resetEveningReminderPreferences() {
+        cancelEveningReminder()
+        remindersEnabled = false
+        nextReminderSummary = nil
+        UserDefaults.standard.removeObject(forKey: defaultsEnabledKey)
+        UserDefaults.standard.removeObject(forKey: defaultsHourKey)
+        UserDefaults.standard.removeObject(forKey: defaultsMinuteKey)
+    }
+    
     private func scheduleEveningReminderIfNeeded(habitManager: HabitManager) {
         cancelEveningReminder()
         

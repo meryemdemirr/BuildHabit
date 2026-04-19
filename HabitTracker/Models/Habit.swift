@@ -18,6 +18,8 @@ enum HabitFrequency: String, Codable, CaseIterable {
 struct Habit: Identifiable, Codable {
     var id: UUID
     var title: String
+    /// Kullanıcının eklediği açıklama metni (eski kayıtlarda olmayabilir).
+    var notes: String?
     var icon: String
     var color: CodableColor
     var streak: Int
@@ -26,9 +28,10 @@ struct Habit: Identifiable, Codable {
     var frequency: HabitFrequency = .daily
     var scheduledDates: [Date] = [] // Sıklığa göre otomatik eklenen günler
     
-    init(title: String, icon: String, color: Color, streak: Int = 0, createdAt: Date? = nil, frequency: HabitFrequency = .daily) {
+    init(title: String, icon: String, color: Color, streak: Int = 0, createdAt: Date? = nil, frequency: HabitFrequency = .daily, notes: String? = nil) {
         self.id = UUID()
         self.title = title
+        self.notes = notes
         self.icon = icon
         self.color = CodableColor(color: color)
         self.streak = streak

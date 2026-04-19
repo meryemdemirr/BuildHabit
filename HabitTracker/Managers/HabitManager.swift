@@ -31,9 +31,26 @@ class HabitManager: ObservableObject {
         }
     }
     
-    // Habit sil
+    /// Tek bir alışkanlığı kaldırır (yerel depolama).
     func deleteHabit(_ habit: Habit) {
         habits.removeAll { $0.id == habit.id }
+        saveHabits()
+    }
+    
+    /// Tüm alışkanlıkları kaldırır (`UserDefaults` içindeki `saved_habits`).
+    func deleteAllHabits() {
+        habits.removeAll()
+        saveHabits()
+    }
+    
+    /// Tamamlama geçmişi ve serileri sıfırlanır; alışkanlık tanımları (sıklık, planlı günler vb.) kalır.
+    func resetAllCompletionProgress() {
+        habits = habits.map { habit in
+            var h = habit
+            h.completionDates = []
+            h.streak = 0
+            return h
+        }
         saveHabits()
     }
     

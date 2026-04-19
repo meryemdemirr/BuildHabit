@@ -222,16 +222,17 @@ struct AddHabitSheet: View {
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: selectedStartDate)
         
+        let trimmedDescription = habitDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         var newHabit = Habit(
             title: habitTitle,
             icon: selectedIcon,
             color: selectedColor.color,
             streak: 0,
             createdAt: startDate,
-            frequency: selectedFrequency
+            frequency: selectedFrequency,
+            notes: trimmedDescription.isEmpty ? nil : trimmedDescription
         )
         
-       
         var scheduledDates: [Date] = []
         
         switch selectedFrequency {

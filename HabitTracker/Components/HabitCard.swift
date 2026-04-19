@@ -10,7 +10,10 @@ import SwiftUI
 struct HabitCard: View {
     let habit: Habit
     let selectedDate: Date
-    let onTap: () -> Void
+    /// Tamamlama dairesine basılınca.
+    let onCompletionToggle: () -> Void
+    /// Kartın sol alanına (başlık/ikon) basılınca — detay.
+    let onDetailTap: () -> Void
     @State private var isPressed = false
     
     private var isCompleted: Bool {
@@ -19,43 +22,47 @@ struct HabitCard: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Icon - Dinamik soluk renk arka plan mantığı (Dark Mode uyumlu)
-            ZStack {
-                // Seçilen rengin soluk versiyonu (opacity 0.2 - Dark Mode uyumlu)
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(habit.swiftUIColor.opacity(0.2))
-                    .frame(width: 56, height: 56)
-                
-                // İkon tam renk
-                Image(systemName: habit.icon)
-                    .font(.system(size: 24, weight: .medium))
-                    .foregroundColor(habit.swiftUIColor)
-            }
-            
-            // Content
-            VStack(alignment: .leading, spacing: 6) {
-                Text(habit.title)
-                    .font(.system(size: 17, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color(.label))
-                
-                HStack(spacing: 6) {
-                    Image(systemName: "flame.fill")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(Color(red: 1.0, green: 0.6, blue: 0.4))
+            Button(action: onDetailTap) {
+                HStack(spacing: 16) {
+                    // Icon - Dinamik soluk renk arka plan mantığı (Dark Mode uyumlu)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(habit.swiftUIColor.opacity(0.2))
+                            .frame(width: 56, height: 56)
+                        
+                        Image(systemName: habit.icon)
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(habit.swiftUIColor)
+                    }
                     
-                    Text("\(habit.streak) gün streak")
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundColor(Color(.secondaryLabel))
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(habit.title)
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            .foregroundColor(Color(.label))
+                            .multilineTextAlignment(.leading)
+                        
+                        HStack(spacing: 6) {
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(Color(red: 1.0, green: 0.6, blue: 0.4))
+                            
+                            Text("\(habit.streak) gün streak")
+                                .font(.system(size: 13, weight: .medium, design: .rounded))
+                                .foregroundColor(Color(.secondaryLabel))
+                        }
+                    }
                 }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             
-            Spacer()
+            Spacer(minLength: 8)
             
             // Check button - Tarih bazlı tamamlama
             Button(action: {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                     isPressed = true
-                    onTap()
+                    onCompletionToggle()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     isPressed = false
@@ -104,7 +111,8 @@ struct HabitCard: View {
                 streak: 5
             ),
             selectedDate: Date(),
-            onTap: {}
+            onCompletionToggle: {},
+            onDetailTap: {}
         )
     }
     .padding()

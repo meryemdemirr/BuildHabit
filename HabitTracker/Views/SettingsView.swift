@@ -11,7 +11,6 @@ struct SettingsView: View {
     @Binding var selectedTab: Int
     @Binding var openedFromHome: Bool
     
-    @EnvironmentObject var appState: AppStateManager
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showProfile = false
@@ -19,11 +18,10 @@ struct SettingsView: View {
     
     var body: some View {
         ZStack {
-                // Sistem arka plan rengi
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-                
-                List {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+            
+            List {
                     // Profil Bölümü
                     Section {
                         HStack(spacing: 16) {
@@ -125,12 +123,18 @@ struct SettingsView: View {
                         }
                         .padding(.vertical, 4)
                         
-                        SettingsRow(
-                            icon: "chart.bar.fill",
-                            iconColor: Color(red: 0.5, green: 0.9, blue: 0.6),
-                            title: "Veri Yönetimi",
-                            subtitle: "Yedekleme ve geri yükleme"
-                        )
+                        NavigationLink {
+                            DataManagementView()
+                        } label: {
+                            SettingsRow(
+                                icon: "chart.bar.fill",
+                                iconColor: Color(red: 0.5, green: 0.9, blue: 0.6),
+                                title: "Veri Yönetimi",
+                                subtitle: "Alışkanlık verilerini yönet",
+                                showsDisclosure: false
+                            )
+                        }
+                        .buttonStyle(.plain)
                     } header: {
                         Text("Ayarlar")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -143,7 +147,8 @@ struct SettingsView: View {
                             icon: "info.circle.fill",
                             iconColor: Color(red: 0.6, green: 0.8, blue: 1.0),
                             title: "Uygulama Hakkında",
-                            subtitle: "Sürüm 1.0"
+                            subtitle: "Sürüm 1.0",
+                            showsDisclosure: false
                         )
                         
                         SettingsRow(
@@ -172,25 +177,9 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    
-                    // Onboarding (Test için)
-                    Section {
-                        Button(action: {
-                            // Onboarding'i sıfırla
-                            appState.isOnboardingComplete = false
-                            UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
-                        }) {
-                            HStack {
-                                Spacer()
-                                Text("Onboarding'i Tekrar Göster")
-                                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                                    .foregroundColor(Color(.secondaryLabel))
-                                Spacer()
-                            }
-                        }
-                    }
                 }
                 .scrollContentBackground(.hidden)
+                .listStyle(.insetGrouped)
         }
         .navigationTitle("Ayarlar")
         .navigationBarTitleDisplayMode(.large)
@@ -335,7 +324,6 @@ struct ProfileView: View {
     
     NavigationStack {
         SettingsView(selectedTab: $selectedTab, openedFromHome: $openedFromHome)
-            .environmentObject(AppStateManager())
             .environmentObject(AuthManager())
             .environmentObject(ThemeManager())
             .environmentObject(HabitManager())
