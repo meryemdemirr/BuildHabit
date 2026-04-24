@@ -10,6 +10,7 @@ import SwiftUI
 struct HabitCard: View {
     let habit: Habit
     let selectedDate: Date
+    let isInteractionEnabled: Bool
     /// Tamamlama dairesine basılınca.
     let onCompletionToggle: () -> Void
     /// Kartın sol alanına (başlık/ikon) basılınca — detay.
@@ -90,6 +91,8 @@ struct HabitCard: View {
                     }
                 }
             }
+            .disabled(!isInteractionEnabled)
+            .opacity(isInteractionEnabled ? 1.0 : 0.45)
             .scaleEffect(isPressed ? 0.9 : 1.0)
         }
         .padding(18)
@@ -111,6 +114,7 @@ struct HabitCard: View {
                 streak: 5
             ),
             selectedDate: Date(),
+            isInteractionEnabled: true,
             onCompletionToggle: {},
             onDetailTap: {}
         )

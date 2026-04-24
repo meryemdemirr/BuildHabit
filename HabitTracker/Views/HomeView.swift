@@ -23,6 +23,10 @@ struct HomeView: View {
     private var filteredHabits: [Habit] {
         habitManager.habitsForDate(selectedDate)
     }
+
+    private var isPastSelectedDate: Bool {
+        Calendar.current.startOfDay(for: selectedDate) < Calendar.current.startOfDay(for: Date())
+    }
     
     var totalHabits: Int {
         filteredHabits.count
@@ -45,13 +49,14 @@ struct HomeView: View {
             }) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color(red: 0.95, green: 0.7, blue: 0.5))
+                    .foregroundColor(isPastSelectedDate ? Color(.systemGray2) : Color(red: 0.95, green: 0.7, blue: 0.5))
                     .frame(width: 36, height: 36)
                     .background(
                         Circle()
-                            .fill(Color(red: 0.95, green: 0.7, blue: 0.5).paleBackground)
+                            .fill(isPastSelectedDate ? Color(.systemGray5) : Color(red: 0.95, green: 0.7, blue: 0.5).paleBackground)
                     )
             }
+            .disabled(isPastSelectedDate)
         }
         .padding(.horizontal, 20)
         .textCase(nil)
@@ -117,7 +122,7 @@ struct HomeView: View {
                                     }
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel("Open settings")
+                                .accessibilityLabel("Ayarları aç")
                             }
                             .padding(.top, 12)
                             
@@ -164,27 +169,29 @@ struct HomeView: View {
                                     .font(.system(size: 16, weight: .medium, design: .rounded))
                                     .foregroundColor(Color(.secondaryLabel))
                                 
-                                Button(action: {
-                                    showAddHabitSheet = true
-                                }) {
-                                    Text("İlk Alışkanlığını Ekle")
-                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 24)
-                                        .padding(.vertical, 12)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .fill(
-                                                    LinearGradient(
-                                                        colors: [
-                                                            Color(red: 0.95, green: 0.7, blue: 0.5),
-                                                            Color(red: 0.95, green: 0.5, blue: 0.7)
-                                                        ],
-                                                        startPoint: .leading,
-                                                        endPoint: .trailing
+                                if !isPastSelectedDate {
+                                    Button(action: {
+                                        showAddHabitSheet = true
+                                    }) {
+                                        Text("İlk alışkanlığını ekle")
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 24)
+                                            .padding(.vertical, 12)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .fill(
+                                                        LinearGradient(
+                                                            colors: [
+                                                                Color(red: 0.95, green: 0.7, blue: 0.5),
+                                                                Color(red: 0.95, green: 0.5, blue: 0.7)
+                                                            ],
+                                                            startPoint: .leading,
+                                                            endPoint: .trailing
+                                                        )
                                                     )
-                                                )
-                                        )
+                                            )
+                                    }
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -201,6 +208,7 @@ struct HomeView: View {
                                 HabitCard(
                                     habit: habit,
                                     selectedDate: selectedDate,
+                                    isInteractionEnabled: !isPastSelectedDate,
                                     onCompletionToggle: {
                                         _ = habitManager.toggleCompletion(for: habit, on: selectedDate)
                                     },

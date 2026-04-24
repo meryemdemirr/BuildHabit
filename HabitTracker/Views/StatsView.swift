@@ -127,7 +127,7 @@ struct StatsView: View {
                                 .font(.system(size: 14, weight: .medium, design: .rounded))
                                 .foregroundStyle(Color(.secondaryLabel))
                                 .lineLimit(1)
-                                .truncationMode(.head)
+                                .truncationMode(.tail)
                                 .multilineTextAlignment(.center)
                                 .frame(width: habitColumnWidth, height: rowHeight, alignment: .center)
 

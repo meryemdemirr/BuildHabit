@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddHabitSheet: View {
     @EnvironmentObject var habitManager: HabitManager
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.dismissEntireAddFlow) private var dismissEntireAddFlow
     
     @State private var habitTitle: String
@@ -176,15 +176,19 @@ struct AddHabitSheet: View {
         }
         .navigationTitle("Yeni Alışkanlık")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Vazgeç") {
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Color(.label))
                     }
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundColor(Color(.label))
+                    .accessibilityLabel("Geri")
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Kaydet") {
                         saveHabit()

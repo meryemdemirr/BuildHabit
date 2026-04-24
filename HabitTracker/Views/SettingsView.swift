@@ -186,12 +186,12 @@ struct SettingsView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 17, weight: .semibold))
-                            Text("Home")
+                            Text("Ana Sayfa")
                                 .font(.system(size: 17, weight: .regular))
                         }
                         .foregroundStyle(Color(.label))
                     }
-                    .accessibilityLabel("Back to Home")
+                    .accessibilityLabel("Ana sayfaya dön")
                 }
             }
         }

@@ -78,7 +78,7 @@ struct OnboardingView: View {
                                 currentPage -= 1
                             }
                         }) {
-                            Text("Back")
+                            Text("Geri")
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(red: 0.3, green: 0.2, blue: 0.4))
                                 .frame(maxWidth: .infinity)
@@ -97,7 +97,7 @@ struct OnboardingView: View {
                             isOnboardingComplete = true
                         }
                     }) {
-                        Text(currentPage < pages.count - 1 ? "Next" : "Get Started")
+                        Text(currentPage < pages.count - 1 ? "İleri" : "Başla")
                             .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
