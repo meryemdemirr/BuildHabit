@@ -150,13 +150,6 @@ struct SettingsView: View {
                             subtitle: "Sürüm 1.0",
                             showsDisclosure: false
                         )
-                        
-                        SettingsRow(
-                            icon: "star.fill",
-                            iconColor: Color(red: 1.0, green: 0.9, blue: 0.4),
-                            title: "Uygulamayı Değerlendir",
-                            subtitle: "App Store'da puan ver"
-                        )
                     } header: {
                         Text("Hakkında")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
