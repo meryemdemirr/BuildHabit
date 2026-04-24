@@ -10,21 +10,15 @@ import SwiftUI
 struct HomeView: View {
     @Binding var selectedTab: Int
     @Binding var openedFromHome: Bool
+    @Binding var selectedDate: Date
     
     @EnvironmentObject var habitManager: HabitManager
     @State private var showAddHabitSheet = false
-    @State private var selectedDate = Date()
     @State private var selectedHabit: Habit?
     @State private var showDetail = false
     @State private var habitPendingDelete: Habit?
     @State private var showDeleteConfirmation = false
-    
-    private var isPastDate: Bool {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let selected = calendar.startOfDay(for: selectedDate)
-        return selected < today
-    }
+    @State private var showCalendarSheet = false
     
     private var filteredHabits: [Habit] {
         habitManager.habitsForDate(selectedDate)
@@ -51,22 +45,13 @@ struct HomeView: View {
             }) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(
-                        isPastDate ?
-                        Color(.tertiaryLabel) :
-                        Color(red: 0.95, green: 0.7, blue: 0.5)
-                    )
+                    .foregroundColor(Color(red: 0.95, green: 0.7, blue: 0.5))
                     .frame(width: 36, height: 36)
                     .background(
                         Circle()
-                            .fill(
-                                isPastDate ?
-                                Color(.systemGray5) :
-                                Color(red: 0.95, green: 0.7, blue: 0.5).paleBackground
-                            )
+                            .fill(Color(red: 0.95, green: 0.7, blue: 0.5).paleBackground)
                     )
             }
-            .disabled(isPastDate)
         }
         .padding(.horizontal, 20)
         .textCase(nil)
@@ -92,6 +77,21 @@ struct HomeView: View {
                                 }
                                 
                                 Spacer()
+
+                                Button {
+                                    showCalendarSheet = true
+                                } label: {
+                                    Image(systemName: "calendar")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(Color(.label))
+                                        .frame(width: 40, height: 40)
+                                        .background(
+                                            Circle()
+                                                .fill(Color(.secondarySystemGroupedBackground))
+                                        )
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel("Takvimden tarih seç")
                                 
                                 Button {
                                     openedFromHome = true
@@ -160,33 +160,31 @@ struct HomeView: View {
                                     .font(.system(size: 48))
                                     .foregroundColor(Color(.tertiaryLabel))
                                 
-                                Text(isPastDate ? "Bu tarihte alışkanlık yok" : "Henüz alışkanlık eklenmedi")
+                                Text("Bu tarihte alışkanlık yok")
                                     .font(.system(size: 16, weight: .medium, design: .rounded))
                                     .foregroundColor(Color(.secondaryLabel))
                                 
-                                if !isPastDate {
-                                    Button(action: {
-                                        showAddHabitSheet = true
-                                    }) {
-                                        Text("İlk Alışkanlığını Ekle")
-                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 24)
-                                            .padding(.vertical, 12)
-                                            .background(
-                                                RoundedRectangle(cornerRadius: 16)
-                                                    .fill(
-                                                        LinearGradient(
-                                                            colors: [
-                                                                Color(red: 0.95, green: 0.7, blue: 0.5),
-                                                                Color(red: 0.95, green: 0.5, blue: 0.7)
-                                                            ],
-                                                            startPoint: .leading,
-                                                            endPoint: .trailing
-                                                        )
+                                Button(action: {
+                                    showAddHabitSheet = true
+                                }) {
+                                    Text("İlk Alışkanlığını Ekle")
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 24)
+                                        .padding(.vertical, 12)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(
+                                                    LinearGradient(
+                                                        colors: [
+                                                            Color(red: 0.95, green: 0.7, blue: 0.5),
+                                                            Color(red: 0.95, green: 0.5, blue: 0.7)
+                                                        ],
+                                                        startPoint: .leading,
+                                                        endPoint: .trailing
                                                     )
-                                            )
-                                    }
+                                                )
+                                        )
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -232,7 +230,6 @@ struct HomeView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                .padding(.bottom, 88)
                 
                 if showDetail, let habit = selectedHabit {
                     HabitDetailOverlay(habit: habit) {
@@ -246,8 +243,16 @@ struct HomeView: View {
             .animation(.easeOut(duration: 0.2), value: showDetail)
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showAddHabitSheet) {
-                AddHabitSheet()
-                    .environmentObject(habitManager)
+                NavigationStack {
+                    AddHabitEntryView(initialStartDate: selectedDate)
+                }
+                .environmentObject(habitManager)
+                .environment(\.dismissEntireAddFlow) {
+                    showAddHabitSheet = false
+                }
+            }
+            .sheet(isPresented: $showCalendarSheet) {
+                CalendarShortcutSheet(selectedDate: $selectedDate)
             }
             .alert("Alışkanlığı sil", isPresented: $showDeleteConfirmation) {
                 Button("İptal", role: .cancel) {
@@ -272,12 +277,59 @@ struct HomeView: View {
     }
 }
 
+private struct CalendarShortcutSheet: View {
+    @Binding var selectedDate: Date
+    @Environment(\.dismiss) private var dismiss
+    @State private var pickerDate: Date
+
+    init(selectedDate: Binding<Date>) {
+        _selectedDate = selectedDate
+        _pickerDate = State(initialValue: Calendar.current.startOfDay(for: selectedDate.wrappedValue))
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 18) {
+                DatePicker(
+                    "Tarih Seç",
+                    selection: $pickerDate,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.graphical)
+                .labelsHidden()
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color(.secondarySystemGroupedBackground))
+                )
+
+                Text("Bir gün seçtiğinde ana ekrana dönülür.")
+                    .font(.system(size: 13, weight: .regular, design: .rounded))
+                    .foregroundColor(Color(.secondaryLabel))
+            }
+            .padding(20)
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("Takvim")
+            .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: pickerDate) { _, newDate in
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {
+                    selectedDate = Calendar.current.startOfDay(for: newDate)
+                }
+                dismiss()
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+    }
+}
+
 #Preview {
     @Previewable @State var selectedTab = 0
     @Previewable @State var openedFromHome = false
+    @Previewable @State var selectedDate = Date()
     
     NavigationStack {
-        HomeView(selectedTab: $selectedTab, openedFromHome: $openedFromHome)
+        HomeView(selectedTab: $selectedTab, openedFromHome: $openedFromHome, selectedDate: $selectedDate)
             .environmentObject(HabitManager())
     }
 }

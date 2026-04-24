@@ -10,58 +10,50 @@ import SwiftUI
 struct AddHabitSheet: View {
     @EnvironmentObject var habitManager: HabitManager
     @Environment(\.dismiss) var dismiss
+    @Environment(\.dismissEntireAddFlow) private var dismissEntireAddFlow
     
-    @State private var habitTitle = ""
-    @State private var habitDescription = ""
-    @State private var selectedColor: PastelColor = .blue
-    @State private var selectedIcon = "book.fill"
-    @State private var selectedFrequency: HabitFrequency = .daily
-    @State private var selectedStartDate = Date()
+    @State private var habitTitle: String
+    @State private var habitDescription: String
+    @State private var selectedColor: PastelColor
+    @State private var selectedIcon: String
+    @State private var selectedFrequency: HabitFrequency
+    @State private var selectedStartDate: Date
     
-    // Pastel renkler
-    enum PastelColor: String, CaseIterable {
-        case blue = "Pastel Mavi"
-        case green = "Pastel Yeşil"
-        case pink = "Pastel Pembe"
-        case yellow = "Pastel Sarı"
-        case purple = "Pastel Mor"
-        case orange = "Pastel Turuncu"
-        
-        var color: Color {
-            switch self {
-            case .blue:
-                return Color(red: 0.6, green: 0.8, blue: 1.0)
-            case .green:
-                return Color(red: 0.5, green: 0.9, blue: 0.6)
-            case .pink:
-                return Color(red: 1.0, green: 0.7, blue: 0.8)
-            case .yellow:
-                return Color(red: 1.0, green: 0.95, blue: 0.6)
-            case .purple:
-                return Color(red: 0.8, green: 0.7, blue: 1.0)
-            case .orange:
-                return Color(red: 1.0, green: 0.8, blue: 0.6)
-            }
+    init(entryMode: AddHabitEntryMode = .custom, initialStartDate: Date = Date()) {
+        let normalizedInitialDate = Calendar.current.startOfDay(for: initialStartDate)
+        switch entryMode {
+        case .custom:
+            _habitTitle = State(initialValue: "")
+            _habitDescription = State(initialValue: "")
+            _selectedColor = State(initialValue: .blue)
+            _selectedIcon = State(initialValue: "book.fill")
+            _selectedFrequency = State(initialValue: .daily)
+            _selectedStartDate = State(initialValue: normalizedInitialDate)
+        case .preset(let template):
+            _habitTitle = State(initialValue: template.title)
+            _habitDescription = State(initialValue: "")
+            _selectedColor = State(initialValue: template.color)
+            _selectedIcon = State(initialValue: template.icon)
+            _selectedFrequency = State(initialValue: .daily)
+            _selectedStartDate = State(initialValue: normalizedInitialDate)
         }
     }
     
-    // Popüler SF Symbols ikonları
-    let availableIcons = [
-        "book.fill", "figure.run", "leaf.fill", "cup.and.saucer.fill",
-        "pills.fill", "bed.double.fill", "drop.fill", "flame.fill",
-        "heart.fill", "star.fill", "moon.fill", "sun.max.fill"
+    /// İkon seçicide gösterilen SF Symbols (şablon ikonları dahil).
+    private let availableIcons = [
+        "book.fill", "books.vertical.fill", "figure.run", "figure.walk", "leaf.fill",
+        "drop.fill", "sun.max.fill", "alarm.fill", "sparkles", "moon.fill",
+        "star.fill", "heart.fill", "flame.fill", "cup.and.saucer.fill",
+        "pills.fill", "bed.double.fill"
     ]
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                // Sistem arka plan rengi (Light/Dark mode uyumlu)
+        ZStack {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
                 
                 Form {
                     Section {
-                        // Alışkanlık İsmi
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Alışkanlık İsmi")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -77,7 +69,6 @@ struct AddHabitSheet: View {
                         }
                         .padding(.vertical, 8)
                         
-                        // Açıklama
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Açıklama")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -104,7 +95,6 @@ struct AddHabitSheet: View {
                     }
                     
                     Section {
-                        // Renk Seçimi - 6 Pastel Renk (Küçük)
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Renk Seçimi")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -113,7 +103,7 @@ struct AddHabitSheet: View {
                             HStack(spacing: 16) {
                                 ForEach(PastelColor.allCases, id: \.self) { pastelColor in
                                     ColorCircleView(
-                                        color: pastelColor.color,
+                                        color: pastelColor.swiftUIColor,
                                         isSelected: selectedColor == pastelColor
                                     ) {
                                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -132,17 +122,15 @@ struct AddHabitSheet: View {
                     }
                     
                     Section {
-                        // İkon Seçimi - Sadece Horizontal Scroll (Önizleme yok)
                         VStack(alignment: .leading, spacing: 12) {
                             Text("İkon Seçimi")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            // İkon Horizontal Scroll
                             IconSelectionView(
                                 icons: availableIcons,
                                 selectedIcon: $selectedIcon,
-                                selectedColor: selectedColor.color
+                                selectedColor: selectedColor.swiftUIColor
                             )
                         }
                         .padding(.vertical, 8)
@@ -153,7 +141,6 @@ struct AddHabitSheet: View {
                     }
                     
                     Section {
-                        // Başlangıç Tarihi
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Başlangıç Tarihi")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -165,7 +152,6 @@ struct AddHabitSheet: View {
                         }
                         .padding(.vertical, 8)
                         
-                        // Sıklık Seçimi
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Sıklık")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -187,11 +173,10 @@ struct AddHabitSheet: View {
                 }
                 .scrollContentBackground(.hidden)
                 .background(Color(.systemGroupedBackground))
-            }
-            .navigationTitle("Yeni Alışkanlık")
-            .navigationBarTitleDisplayMode(.inline)
-            .background(Color(.systemGroupedBackground))
-            .toolbar {
+        }
+        .navigationTitle("Yeni Alışkanlık")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Vazgeç") {
                         dismiss()
@@ -206,27 +191,27 @@ struct AddHabitSheet: View {
                     }
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundColor(
-                        habitTitle.isEmpty ?
+                        habitTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?
                         Color(.secondaryLabel) :
-                        selectedColor.color
+                            selectedColor.swiftUIColor
                     )
-                    .disabled(habitTitle.isEmpty)
+                    .disabled(habitTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-            }
         }
     }
     
     private func saveHabit() {
-        guard !habitTitle.isEmpty else { return }
+        let title = habitTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
         
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: selectedStartDate)
         
         let trimmedDescription = habitDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         var newHabit = Habit(
-            title: habitTitle,
+            title: title,
             icon: selectedIcon,
-            color: selectedColor.color,
+            color: selectedColor.swiftUIColor,
             streak: 0,
             createdAt: startDate,
             frequency: selectedFrequency,
@@ -237,23 +222,16 @@ struct AddHabitSheet: View {
         
         switch selectedFrequency {
         case .none:
-            // Sıklık yok: Sadece manuel işaretlenen günler
             break
-            
         case .daily:
-            // Sadece seçili gün
             scheduledDates.append(startDate)
-            
         case .weekly:
-            // Seçili günden itibaren 7 gün
             for i in 0..<7 {
                 if let date = calendar.date(byAdding: .day, value: i, to: startDate) {
                     scheduledDates.append(date)
                 }
             }
-            
         case .monthly:
-            // Seçili günden itibaren 30 gün
             for i in 0..<30 {
                 if let date = calendar.date(byAdding: .day, value: i, to: startDate) {
                     scheduledDates.append(date)
@@ -267,11 +245,20 @@ struct AddHabitSheet: View {
             habitManager.addHabit(newHabit)
         }
         
-        dismiss()
+        dismissEntireAddFlow()
     }
 }
 
-#Preview {
-    AddHabitSheet()
-        .environmentObject(HabitManager())
+#Preview("Özel") {
+    NavigationStack {
+        AddHabitSheet(entryMode: .custom)
+    }
+    .environmentObject(HabitManager())
+}
+
+#Preview("Şablon") {
+    NavigationStack {
+        AddHabitSheet(entryMode: .preset(PresetHabitTemplate.library[0]))
+    }
+    .environmentObject(HabitManager())
 }

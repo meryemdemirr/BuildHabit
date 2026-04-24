@@ -24,9 +24,13 @@ struct SignUpView: View {
     var passwordsMatch: Bool {
         !password.isEmpty && password == confirmPassword
     }
+
+    var isEmailValid: Bool {
+        authManager.isValidEmail(email)
+    }
     
     var isFormValid: Bool {
-        !name.isEmpty && !email.isEmpty && !password.isEmpty && passwordsMatch && password.count >= 6
+        !name.isEmpty && !email.isEmpty && isEmailValid && !password.isEmpty && passwordsMatch && password.count >= 6
     }
     
     var body: some View {
@@ -103,6 +107,12 @@ struct SignUpView: View {
                                         .fill(Color(.secondarySystemGroupedBackground))
                                 )
                                 .focused($focusedField, equals: .email)
+
+                            if !email.isEmpty && !isEmailValid {
+                                Text("Geçerli bir e-posta girin (örn. gmail.com, hotmail.com, outlook.com)")
+                                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                                    .foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.3))
+                            }
                         }
                         
                         // Password Field

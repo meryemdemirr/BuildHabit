@@ -10,21 +10,30 @@ import SwiftUI
 struct WeeklyCalendarView: View {
     @Binding var selectedDate: Date
     
-    // Bugünü merkeze alan 7 günlük görünüm (önceki 3 gün + bugün + sonraki 3 gün)
+    // Her zaman seçili tarihin haftasını gösterir: Pazartesi -> Pazar
     private var weekDates: [Date] {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        
-        return (-3...3).compactMap { dayOffset in
-            calendar.date(byAdding: .day, value: dayOffset, to: today)
+        let normalizedSelectedDate = calendar.startOfDay(for: selectedDate)
+        let weekday = calendar.component(.weekday, from: normalizedSelectedDate)
+        let mondayOffset = (weekday + 5) % 7
+        guard let monday = calendar.date(byAdding: .day, value: -mondayOffset, to: normalizedSelectedDate) else {
+            return []
+        }
+        return (0..<7).compactMap { dayOffset in
+            calendar.date(byAdding: .day, value: dayOffset, to: monday)
         }
     }
     
     private func dayName(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "EEE"
-        return formatter.string(from: date).uppercased()
+        switch Calendar.current.component(.weekday, from: date) {
+        case 2: return "Pzt"
+        case 3: return "Sal"
+        case 4: return "Çar"
+        case 5: return "Per"
+        case 6: return "Cum"
+        case 7: return "Cmt"
+        default: return "Paz"
+        }
     }
     
     private func dayNumber(for date: Date) -> String {

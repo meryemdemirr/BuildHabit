@@ -17,6 +17,10 @@ struct LoginView: View {
     enum Field {
         case email, password
     }
+
+    var isEmailValid: Bool {
+        authManager.isValidEmail(email)
+    }
     
     var body: some View {
         ZStack {
@@ -78,6 +82,12 @@ struct LoginView: View {
                                         .fill(Color(.secondarySystemGroupedBackground))
                                 )
                                 .focused($focusedField, equals: .email)
+
+                            if !email.isEmpty && !isEmailValid {
+                                Text("Geçerli bir e-posta adresi girin")
+                                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                                    .foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.3))
+                            }
                         }
                         
                         // Password Field
@@ -125,8 +135,8 @@ struct LoginView: View {
                                         )
                                 )
                         }
-                        .disabled(email.isEmpty || password.isEmpty)
-                        .opacity(email.isEmpty || password.isEmpty ? 0.6 : 1.0)
+                        .disabled(email.isEmpty || !isEmailValid || password.isEmpty)
+                        .opacity(email.isEmpty || !isEmailValid || password.isEmpty ? 0.6 : 1.0)
                     }
                     .padding(.horizontal, 24)
                     

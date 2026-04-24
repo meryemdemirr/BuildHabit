@@ -25,9 +25,38 @@ class AuthManager: ObservableObject {
         }
     }
     
+    private let emailRegex = "^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+
+    func isValidEmail(_ email: String) -> Bool {
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        let lowered = trimmed.lowercased()
+        guard NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: lowered) else { return false }
+
+        let commonDomains = ["gmail", "hotmail", "outlook"]
+        if let atIndex = lowered.firstIndex(of: "@") {
+            let domain = String(lowered[lowered.index(after: atIndex)...])
+            for provider in commonDomains where domain.hasPrefix("\(provider).") {
+                return domain == "\(provider).com"
+            }
+        }
+
+        return true
+    }
+
     // Sign Up
     func signUp(name: String, email: String, password: String, completion: @escaping (Bool) -> Void) {
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
+        let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard isValidEmail(normalizedEmail) else {
+            DispatchQueue.main.async {
+                self.errorMessage = "Geçerli bir e-posta adresi girin (ör. adiniz@gmail.com)."
+                self.showError = true
+                completion(false)
+            }
+            return
+        }
+
+        Auth.auth().createUser(withEmail: normalizedEmail, password: password) { [weak self] result, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self?.errorMessage = error.localizedDescription
@@ -55,7 +84,17 @@ class AuthManager: ObservableObject {
     
     // Sign In
     func signIn(email: String, password: String, completion: @escaping (Bool) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
+        let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard isValidEmail(normalizedEmail) else {
+            DispatchQueue.main.async {
+                self.errorMessage = "Geçerli bir e-posta adresi girin."
+                self.showError = true
+                completion(false)
+            }
+            return
+        }
+
+        Auth.auth().signIn(withEmail: normalizedEmail, password: password) { [weak self] result, error in
             DispatchQueue.main.async {
                 if let error = error {
                     self?.errorMessage = error.localizedDescription

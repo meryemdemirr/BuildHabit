@@ -14,11 +14,16 @@ struct MainTabView: View {
     @StateObject private var habitManager = HabitManager()
     @State private var selectedTab = 0
     @State private var openedFromHome = false
+    @State private var selectedDate = Date()
     
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                HomeView(selectedTab: $selectedTab, openedFromHome: $openedFromHome)
+                HomeView(
+                    selectedTab: $selectedTab,
+                    openedFromHome: $openedFromHome,
+                    selectedDate: $selectedDate
+                )
                     .environmentObject(habitManager)
             }
             .tabItem {
@@ -26,7 +31,7 @@ struct MainTabView: View {
             }
             .tag(0)
             
-            StatsView(habits: habitManager.habits)
+            StatsView(habits: habitManager.habits, selectedDate: selectedDate)
                 .tabItem {
                     Label("Statistics", systemImage: "chart.bar.xaxis")
                 }
