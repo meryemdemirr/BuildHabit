@@ -17,6 +17,7 @@ enum HabitFrequency: String, Codable, CaseIterable {
 
 struct Habit: Identifiable, Codable {
     var id: UUID
+    var userId: String
     var title: String
     /// Kullanıcının eklediği açıklama metni (eski kayıtlarda olmayabilir).
     var notes: String?
@@ -28,8 +29,9 @@ struct Habit: Identifiable, Codable {
     var frequency: HabitFrequency = .daily
     var scheduledDates: [Date] = [] // Sıklığa göre otomatik eklenen günler
     
-    init(title: String, icon: String, color: Color, streak: Int = 0, createdAt: Date? = nil, frequency: HabitFrequency = .daily, notes: String? = nil) {
+    init(title: String, icon: String, color: Color, streak: Int = 0, createdAt: Date? = nil, frequency: HabitFrequency = .daily, notes: String? = nil, userId: String = "") {
         self.id = UUID()
+        self.userId = userId
         self.title = title
         self.notes = notes
         self.icon = icon
@@ -38,6 +40,35 @@ struct Habit: Identifiable, Codable {
         self.createdAt = createdAt ?? Date()
         self.frequency = frequency
         self.scheduledDates = []
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userId
+        case title
+        case notes
+        case icon
+        case color
+        case streak
+        case createdAt
+        case completionDates
+        case frequency
+        case scheduledDates
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        userId = try container.decodeIfPresent(String.self, forKey: .userId) ?? ""
+        title = try container.decode(String.self, forKey: .title)
+        notes = try container.decodeIfPresent(String.self, forKey: .notes)
+        icon = try container.decode(String.self, forKey: .icon)
+        color = try container.decode(CodableColor.self, forKey: .color)
+        streak = try container.decode(Int.self, forKey: .streak)
+        createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
+        completionDates = try container.decodeIfPresent([Date].self, forKey: .completionDates) ?? []
+        frequency = try container.decodeIfPresent(HabitFrequency.self, forKey: .frequency) ?? .daily
+        scheduledDates = try container.decodeIfPresent([Date].self, forKey: .scheduledDates) ?? []
     }
     
     var swiftUIColor: Color {

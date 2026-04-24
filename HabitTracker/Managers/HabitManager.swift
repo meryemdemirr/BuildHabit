@@ -11,15 +11,27 @@ import SwiftUI
 class HabitManager: ObservableObject {
     @Published var habits: [Habit] = []
     
-    private let habitsKey = "saved_habits"
+    private let habitsStoragePrefix = "saved_habits_user_"
+    private var currentUserId: String?
     
-    init() {
+    init(initialUserId: String? = nil) {
+        setCurrentUser(initialUserId)
+    }
+
+    func setCurrentUser(_ userId: String?) {
+        let normalizedId = userId?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let safeId = (normalizedId?.isEmpty == false) ? normalizedId : nil
+        guard safeId != currentUserId else { return }
+        currentUserId = safeId
         loadHabits()
     }
     
     // Habit ekle
     func addHabit(_ habit: Habit) {
-        habits.append(habit)
+        guard let currentUserId else { return }
+        var habitForUser = habit
+        habitForUser.userId = currentUserId
+        habits.append(habitForUser)
         saveHabits()
     }
     
@@ -37,7 +49,7 @@ class HabitManager: ObservableObject {
         saveHabits()
     }
     
-    /// Tüm alışkanlıkları kaldırır (`UserDefaults` içindeki `saved_habits`).
+    /// Aktif kullanıcının tüm alışkanlıklarını kaldırır.
     func deleteAllHabits() {
         habits.removeAll()
         saveHabits()
@@ -151,17 +163,40 @@ class HabitManager: ObservableObject {
     
     // Kaydet
     private func saveHabits() {
+        guard let currentUserId else {
+            habits.removeAll()
+            NotificationCenter.default.post(name: .habitsDidChange, object: nil)
+            return
+        }
+        let key = habitsStoragePrefix + currentUserId
         if let encoded = try? JSONEncoder().encode(habits) {
-            UserDefaults.standard.set(encoded, forKey: habitsKey)
+            UserDefaults.standard.set(encoded, forKey: key)
         }
         NotificationCenter.default.post(name: .habitsDidChange, object: nil)
     }
     
     // Yükle
     private func loadHabits() {
-        if let data = UserDefaults.standard.data(forKey: habitsKey),
-           let decoded = try? JSONDecoder().decode([Habit].self, from: data) {
-            habits = decoded
+        guard let currentUserId else {
+            habits = []
+            NotificationCenter.default.post(name: .habitsDidChange, object: nil)
+            return
         }
+        let key = habitsStoragePrefix + currentUserId
+        if let data = UserDefaults.standard.data(forKey: key),
+           let decoded = try? JSONDecoder().decode([Habit].self, from: data) {
+            habits = decoded.filter { $0.userId.isEmpty || $0.userId == currentUserId }
+            habits = habits.map { habit in
+                var updated = habit
+                if updated.userId.isEmpty {
+                    updated.userId = currentUserId
+                }
+                return updated
+            }
+            saveHabits()
+            return
+        }
+        habits = []
+        NotificationCenter.default.post(name: .habitsDidChange, object: nil)
     }
 }

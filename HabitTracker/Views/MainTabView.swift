@@ -9,6 +9,7 @@ import SwiftUI
 import UIKit
 
 struct MainTabView: View {
+    @EnvironmentObject private var authManager: AuthManager
     @EnvironmentObject private var notificationManager: NotificationManager
     
     @StateObject private var habitManager = HabitManager()
@@ -57,7 +58,14 @@ struct MainTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: .habitsDidChange)) { _ in
             notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
         }
+        .onChange(of: authManager.user?.uid) { _, newUserId in
+            habitManager.setCurrentUser(newUserId)
+            if newUserId == nil {
+                selectedDate = Date()
+            }
+        }
         .onAppear {
+            habitManager.setCurrentUser(authManager.user?.uid)
             notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
             
             let appearance = UITabBarAppearance()
