@@ -58,7 +58,7 @@ struct SignUpView: View {
                         
                         Spacer()
                         
-                        Text("Kayıt Ol")
+                        Text("auth_sign_up")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundColor(Color(.label))
                         
@@ -75,11 +75,11 @@ struct SignUpView: View {
                     VStack(spacing: 20) {
                         // Name Field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Ad Soyad")
+                            Text("auth_name")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            TextField("Adınız ve soyadınız", text: $name)
+                            TextField("auth_name_placeholder", text: $name)
                                 .textContentType(.name)
                                 .font(.system(size: 16, design: .rounded))
                                 .padding(16)
@@ -92,11 +92,11 @@ struct SignUpView: View {
                         
                         // Email Field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("E-posta")
+                            Text("auth_email")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            TextField("ornek@email.com", text: $email)
+                            TextField("auth_email_placeholder", text: $email)
                                 .textContentType(.emailAddress)
                                 .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
@@ -109,7 +109,7 @@ struct SignUpView: View {
                                 .focused($focusedField, equals: .email)
 
                             if !email.isEmpty && !isEmailValid {
-                                Text("Geçerli bir e-posta girin (örn. gmail.com, hotmail.com, outlook.com)")
+                                Text("auth_invalid_email_signup")
                                     .font(.system(size: 12, weight: .regular, design: .rounded))
                                     .foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.3))
                             }
@@ -117,11 +117,11 @@ struct SignUpView: View {
                         
                         // Password Field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Şifre")
+                            Text("auth_password")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            SecureField("En az 6 karakter", text: $password)
+                            SecureField("auth_password_new_placeholder", text: $password)
                                 .textContentType(.newPassword)
                                 .font(.system(size: 16, design: .rounded))
                                 .padding(16)
@@ -132,7 +132,7 @@ struct SignUpView: View {
                                 .focused($focusedField, equals: .password)
                             
                             if !password.isEmpty && password.count < 6 {
-                                Text("Şifre en az 6 karakter olmalıdır")
+                                Text("auth_password_min_length")
                                     .font(.system(size: 12, weight: .regular, design: .rounded))
                                     .foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.3))
                             }
@@ -140,11 +140,11 @@ struct SignUpView: View {
                         
                         // Confirm Password Field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Şifre Tekrar")
+                            Text("auth_confirm_password_label")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            SecureField("Şifrenizi tekrar girin", text: $confirmPassword)
+                            SecureField("auth_confirm_password_placeholder", text: $confirmPassword)
                                 .textContentType(.newPassword)
                                 .font(.system(size: 16, design: .rounded))
                                 .padding(16)
@@ -155,7 +155,7 @@ struct SignUpView: View {
                                 .focused($focusedField, equals: .confirmPassword)
                             
                             if !confirmPassword.isEmpty && !passwordsMatch {
-                                Text("Şifreler eşleşmiyor")
+                                Text("auth_password_mismatch")
                                     .font(.system(size: 12, weight: .regular, design: .rounded))
                                     .foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.3))
                             }
@@ -170,7 +170,7 @@ struct SignUpView: View {
                                 }
                             }
                         }) {
-                            Text("Kayıt Ol")
+                            Text("auth_sign_up")
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -198,10 +198,10 @@ struct SignUpView: View {
                 }
             }
         }
-        .alert("Hata", isPresented: $authManager.showError) {
-            Button("Tamam", role: .cancel) { }
+        .alert("error", isPresented: $authManager.showError) {
+            Button("ok", role: .cancel) { }
         } message: {
-            Text(authManager.errorMessage ?? "Bir hata oluştu")
+            Text(authManager.errorMessage ?? NSLocalizedString("auth_error_generic", comment: ""))
         }
     }
 }

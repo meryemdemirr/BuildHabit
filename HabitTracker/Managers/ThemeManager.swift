@@ -11,6 +11,14 @@ enum AppTheme: String, CaseIterable {
     case light = "Aydınlık"
     case dark = "Karanlık"
     case system = "Sistem"
+
+    var localizedTitle: String {
+        switch self {
+        case .light: return NSLocalizedString("theme_light", comment: "")
+        case .dark: return NSLocalizedString("theme_dark", comment: "")
+        case .system: return NSLocalizedString("theme_system", comment: "")
+        }
+    }
     
     var colorScheme: ColorScheme? {
         switch self {

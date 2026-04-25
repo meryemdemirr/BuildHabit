@@ -118,13 +118,13 @@ struct SplashScreenView: View {
                 
                 // App name with animation
                 VStack(spacing: 8) {
-                    Text("HabitTracker")
+                    Text("auth_app_name")
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                         .foregroundColor(Color(red: 0.3, green: 0.2, blue: 0.4))
                         .offset(y: textOffset)
                         .opacity(textOpacity)
                     
-                    Text("Build Better Habits")
+                    Text("splash_tagline")
                         .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundColor(Color(red: 0.5, green: 0.4, blue: 0.6))
                         .offset(y: textOffset)

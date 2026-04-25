@@ -29,13 +29,13 @@ struct MainTabView: View {
                     .environmentObject(habitManager)
             }
             .tabItem {
-                Label("Ana Sayfa", systemImage: "house.fill")
+                Label("tab_home", systemImage: "house.fill")
             }
             .tag(0)
             
             StatsView(habits: habitManager.habits, selectedDate: selectedDate)
                 .tabItem {
-                    Label("İstatistik", systemImage: "chart.bar.xaxis")
+                    Label("tab_statistics", systemImage: "chart.bar.xaxis")
                 }
                 .tag(1)
             
@@ -44,7 +44,7 @@ struct MainTabView: View {
                     .environmentObject(habitManager)
             }
             .tabItem {
-                Label("Ayarlar", systemImage: "gearshape.fill")
+                Label("tab_settings", systemImage: "gearshape.fill")
             }
             .tag(2)
         }

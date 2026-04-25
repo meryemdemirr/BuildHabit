@@ -49,7 +49,7 @@ struct HabitCard: View {
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundColor(Color(red: 1.0, green: 0.6, blue: 0.4))
                             
-                            Text("\(habit.streak) gün streak")
+                            Text(String(format: NSLocalizedString("habit_streak_days", comment: ""), habit.streak))
                                 .font(.system(size: 13, weight: .medium, design: .rounded))
                                 .foregroundColor(Color(.secondaryLabel))
                         }

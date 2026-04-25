@@ -1,22 +1,193 @@
-"Ana Sayfa" = "Ana Sayfa";
-"İstatistik" = "İstatistik";
-"Ayarlar" = "Ayarlar";
-"Ayarları aç" = "Ayarları aç";
-"Ana sayfaya dön" = "Ana sayfaya dön";
-"İlk alışkanlığını ekle" = "İlk alışkanlığını ekle";
-"Kaydet" = "Kaydet";
-"Yeni Alışkanlık" = "Yeni Alışkanlık";
-"Alışkanlıklarım" = "Alışkanlıklarım";
-"Merhaba," = "Merhaba,";
-"Bugün nasıl gidiyor?" = "Bugün nasıl gidiyor?";
-"Toplam Alışkanlık" = "Toplam Alışkanlık";
-"Aktif Seri" = "Aktif Seri";
-"Bu tarihte alışkanlık yok" = "Bu tarihte alışkanlık yok";
-"Sil" = "Sil";
-"Alışkanlığı sil" = "Alışkanlığı sil";
-"İptal" = "İptal";
-"Bu alışkanlığı silmek istediğine emin misin?" = "Bu alışkanlığı silmek istediğine emin misin?";
-"Takvimden tarih seç" = "Takvimden tarih seç";
-"Geri" = "Geri";
-"İleri" = "İleri";
-"Başla" = "Başla";
+/* Common */
+"ok" = "Tamam";
+"cancel" = "İptal";
+"delete" = "Sil";
+"save" = "Kaydet";
+"close" = "Kapat";
+"back" = "Geri";
+"next" = "İleri";
+"get_started" = "Başla";
+"warning" = "Uyarı";
+"reset" = "Sıfırla";
+"error" = "Hata";
+"settings" = "Ayarlar";
+"profile" = "Profil";
+"about" = "Hakkında";
+"calendar" = "Takvim";
+"notifications" = "Bildirimler";
+"tab_home" = "Ana Sayfa";
+"tab_statistics" = "İstatistik";
+"tab_settings" = "Ayarlar";
+
+/* Required reminder keys */
+"reminder_title" = "Hatırlatma";
+"reminder_body" = "Bugün alışkanlıklarını tamamlamayı unutma!";
+
+/* Splash */
+"splash_tagline" = "Daha İyi Alışkanlıklar Edin";
+
+/* Home */
+"home_my_habits" = "Alışkanlıklarım";
+"home_hello" = "Merhaba,";
+"home_how_today" = "Bugün nasıl gidiyor?";
+"home_pick_date_a11y" = "Takvimden tarih seç";
+"home_open_settings_a11y" = "Ayarları aç";
+"home_total_habits" = "Toplam Alışkanlık";
+"home_active_streak" = "Aktif Seri";
+"home_no_habits_this_date" = "Bu tarihte alışkanlık yok";
+"home_add_first_habit" = "İlk alışkanlığını ekle";
+"home_delete_habit_title" = "Alışkanlığı sil";
+"home_delete_habit_message" = "Bu alışkanlığı silmek istediğine emin misin?";
+"home_today_only_toast" = "Yalnızca bugünün alışkanlıklarını değiştirebilirsin";
+"home_swipe_delete" = "Sil";
+
+/* Calendar sheet */
+"calendar_date_picker_a11y" = "Tarih Seç";
+"calendar_hint" = "Bir gün seçtiğinde ana ekrana dönülür.";
+"calendar_nav_title" = "Takvim";
+
+/* Statistics */
+"stats_caps_habits" = "ALIŞKANLIKLARIN";
+"stats_habit_suffix" = "alışkanlık";
+"stats_caps_best_streak" = "EN İYİ SERİN";
+"stats_days" = "gün";
+"stats_top_habits" = "EN İYİ ALIŞKANLIKLAR";
+"stats_no_habits_yet" = "Henüz alışkanlık yok";
+"stats_daily_average" = "Günlük ortalama";
+"stats_percent_complete" = "%%%d tamamlandı";
+"stats_month_summary" = "Bu ay %1$d habitten %2$d'i tamamlandı";
+"stats_empty_title" = "Henüz veri yok";
+"stats_empty_subtitle" = "Alışkanlık eklediğinde aylık matris burada görünecek.";
+"stats_streak_fire" = "🔥 %d";
+
+/* Settings */
+"settings_section_profile" = "Profil";
+"settings_section_settings" = "Ayarlar";
+"settings_section_about" = "Hakkında";
+"settings_notifications_subtitle" = "Hatırlatmaları yönet";
+"settings_theme" = "Tema";
+"settings_theme_subtitle" = "Görünüm tercihinizi seçin";
+"settings_theme_picker_a11y" = "Tema";
+"settings_data" = "Veri Yönetimi";
+"settings_data_subtitle" = "Alışkanlık verilerini yönet";
+"settings_about_app" = "Uygulama Hakkında";
+"settings_version_subtitle" = "Sürüm 1.0";
+"settings_sign_out" = "Çıkış Yap";
+"settings_sign_out_title" = "Çıkış Yap";
+"settings_sign_out_message" = "Hesabınızdan çıkmak istediğinize emin misiniz?";
+"settings_home" = "Ana Sayfa";
+"settings_back_to_home_a11y" = "Ana sayfaya dön";
+
+/* Notifications screen */
+"notif_enable_toggle" = "Bildirimleri Aç";
+"notif_description" = "Açıkken, bugün için tamamlanmamış alışkanıkların varsa her gün akşam 18:00–22:00 arasında rastgele bir saatte hatırlatma alırsın.";
+"notif_permission_title" = "Bildirim izni gerekli";
+"notif_permission_message" = "Ayarlar > HabitTracker > Bildirimler bölümünden izin verebilirsin.";
+"notif_next_reminder" = "Sonraki hatırlatma: %@";
+
+/* Notification manager summaries */
+"notif_all_done_evening" = "Bugün tamamlanmayan alışkanlığın yok; akşam bildirimi gönderilmeyecek.";
+"notif_schedule_failed" = "Bildirim planlanamadı: %@";
+"notif_next_daily_approx" = "Her gün saat %02d:%02d civarında hatırlatma.";
+"notif_habit_fallback" = "alışkanlığın";
+
+/* Data management */
+"data_footer_note" = "İşlemler bu cihazda saklanan verileri etkiler. Bazıları geri alınamaz.";
+"data_reset_progress_title" = "İlerlemeni Sıfırla";
+"data_reset_progress_subtitle" = "Tamamlamalar ve seriler sıfırlanır; alışkanlıklar kalır.";
+"data_reset_all_title" = "Verileri Sıfırla";
+"data_reset_all_subtitle" = "Alışkanlıklar, ilerleme, bildirim ve tema tercihleri sıfırlanır.";
+"data_reset_confirm" = "Bu işlem geri alınamaz. Emin misin?";
+
+/* Auth */
+"auth_app_name" = "HabitTracker";
+"auth_app_tagline" = "Alışkanlıklarınızı takip edin";
+"auth_email" = "E-posta";
+"auth_password" = "Şifre";
+"auth_name" = "Ad Soyad";
+"auth_sign_in" = "Giriş Yap";
+"auth_sign_up" = "Kayıt Ol";
+"auth_no_account" = "Hesabınız yok mu?";
+"auth_email_placeholder" = "ornek@email.com";
+"auth_password_placeholder" = "Şifrenizi girin";
+"auth_name_placeholder" = "Adınız ve soyadınız";
+"auth_password_new_placeholder" = "En az 6 karakter";
+"auth_confirm_password_placeholder" = "Şifrenizi tekrar girin";
+"auth_confirm_password_label" = "Şifre Tekrar";
+"auth_invalid_email_short" = "Geçerli bir e-posta adresi girin";
+"auth_invalid_email_signup" = "Geçerli bir e-posta girin (örn. gmail.com, hotmail.com, outlook.com)";
+"auth_password_min_length" = "Şifre en az 6 karakter olmalıdır";
+"auth_password_mismatch" = "Şifreler eşleşmiyor";
+"auth_error_generic" = "Bir hata oluştu";
+"auth_error_invalid_email_signup" = "Geçerli bir e-posta adresi girin (ör. adiniz@gmail.com).";
+"auth_error_invalid_email_signin" = "Geçerli bir e-posta adresi girin.";
+
+/* User display fallbacks */
+"user_display_fallback" = "Kullanıcı";
+"user_initial_fallback" = "K";
+
+/* Add habit */
+"add_habit_title" = "Yeni Alışkanlık";
+"add_habit_custom" = "Kendi alışkanlığını ekle";
+"habit_name_label" = "Alışkanlık İsmi";
+"habit_name_placeholder" = "Örn: Sabah Egzersizi";
+"habit_description_label" = "Açıklama";
+"add_section_info" = "Bilgiler";
+"add_section_appearance" = "Görünüm";
+"add_section_icon" = "İkon";
+"add_section_calendar" = "Takvim";
+"color_pick_label" = "Renk Seçimi";
+"icon_pick_label" = "İkon Seçimi";
+"start_date_label" = "Başlangıç Tarihi";
+"frequency_label" = "Sıklık";
+"frequency_picker_a11y" = "Sıklık";
+"toolbar_back_a11y" = "Geri";
+
+/* Habit detail */
+"habit_detail_no_notes" = "Henüz açıklama eklenmedi.";
+
+/* Habit card */
+"habit_streak_days" = "%d gün streak";
+
+/* Onboarding */
+"onboarding_page1_title" = "İlerlemeni Takip Et";
+"onboarding_page1_body" = "Sade ve kullanımı kolay takip ekranı ile alışkanlıklarını gün gün güçlendir.";
+"onboarding_page2_title" = "Motivasyonunu Koru";
+"onboarding_page2_body" = "Nazik hatırlatmalar al, küçük başarılarını gör ve düzenini keyifle sürdür.";
+"onboarding_page3_title" = "İstikrar Kazan";
+"onboarding_page3_body" = "Seriler oluştur, alışkanlıklarının zamanla hayatının doğal bir parçası olduğunu gör.";
+
+/* Theme */
+"theme_light" = "Aydınlık";
+"theme_dark" = "Karanlık";
+"theme_system" = "Sistem";
+
+/* Habit frequency (display) */
+"frequency_none" = "Sıklık Yok";
+"frequency_daily" = "Günlük";
+"frequency_weekly" = "Haftalık";
+"frequency_monthly" = "Aylık";
+
+/* Preset categories */
+"preset_category_self_care" = "Özbakım";
+"preset_category_active" = "Aktif Ol";
+"preset_category_healthier" = "Daha Sağlıklı Ol";
+"preset_category_learn" = "Öğren";
+
+/* Preset titles */
+"preset_title_shower" = "Duş al";
+"preset_title_skincare" = "Cilt bakımını yap";
+"preset_title_haircare" = "Saç bakımını yap";
+"preset_title_run" = "Koşuya çık";
+"preset_title_walk" = "Yürüyüş yap";
+"preset_title_dance" = "Dans et";
+"preset_title_pilates" = "Pilates yap";
+"preset_title_water" = "Su iç";
+"preset_title_fruit" = "Meyve ye";
+"preset_title_healthy_meal" = "Sağlıklı öğün hazırla";
+"preset_title_supplements" = "Takviye al";
+"preset_title_sleep_early" = "Erken uyu";
+"preset_title_wake_early" = "Erken kalk";
+"preset_title_read_book" = "Kitap oku";
+"preset_title_study" = "Ders çalış";
+"preset_title_podcast" = "Podcast dinle";

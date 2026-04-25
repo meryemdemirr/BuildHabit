@@ -11,22 +11,22 @@ struct OnboardingView: View {
     @Binding var isOnboardingComplete: Bool
     @State private var currentPage = 0
     
-    let pages = [
-        OnboardingPage(
-            title: "İlerlemeni Takip Et",
-            description: "Sade ve kullanımı kolay takip ekranı ile alışkanlıklarını gün gün güçlendir.",
+    private let pageSpecs: [OnboardingPageSpec] = [
+        OnboardingPageSpec(
+            titleKey: "onboarding_page1_title",
+            bodyKey: "onboarding_page1_body",
             icon: "chart.line.uptrend.xyaxis",
             color: Color(red: 1.0, green: 0.7, blue: 0.5)
         ),
-        OnboardingPage(
-            title: "Motivasyonunu Koru",
-            description: "Nazik hatırlatmalar al, küçük başarılarını gör ve düzenini keyifle sürdür.",
+        OnboardingPageSpec(
+            titleKey: "onboarding_page2_title",
+            bodyKey: "onboarding_page2_body",
             icon: "sparkles",
             color: Color(red: 1.0, green: 0.5, blue: 0.7)
         ),
-        OnboardingPage(
-            title: "İstikrar Kazan",
-            description: "Seriler oluştur, alışkanlıklarının zamanla hayatının doğal bir parçası olduğunu gör.",
+        OnboardingPageSpec(
+            titleKey: "onboarding_page3_title",
+            bodyKey: "onboarding_page3_body",
             icon: "flame.fill",
             color: Color(red: 0.7, green: 0.5, blue: 1.0)
         )
@@ -49,8 +49,8 @@ struct OnboardingView: View {
             VStack(spacing: 0) {
                 // Page content
                 TabView(selection: $currentPage) {
-                    ForEach(0..<pages.count, id: \.self) { index in
-                        OnboardingPageView(page: pages[index])
+                    ForEach(0..<pageSpecs.count, id: \.self) { index in
+                        OnboardingPageView(page: pageSpecs[index])
                             .tag(index)
                     }
                 }
@@ -59,10 +59,10 @@ struct OnboardingView: View {
                 
                 // Page indicators
                 HStack(spacing: 12) {
-                    ForEach(0..<pages.count, id: \.self) { index in
+                    ForEach(0..<pageSpecs.count, id: \.self) { index in
                         Circle()
-                            .fill(index == currentPage ? 
-                                  Color(red: 0.3, green: 0.2, blue: 0.4) : 
+                            .fill(index == currentPage ?
+                                  Color(red: 0.3, green: 0.2, blue: 0.4) :
                                   Color(red: 0.3, green: 0.2, blue: 0.4).opacity(0.3))
                             .frame(width: index == currentPage ? 12 : 8, height: index == currentPage ? 12 : 8)
                             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentPage)
@@ -78,7 +78,7 @@ struct OnboardingView: View {
                                 currentPage -= 1
                             }
                         }) {
-                            Text("Geri")
+                            Text("back")
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(red: 0.3, green: 0.2, blue: 0.4))
                                 .frame(maxWidth: .infinity)
@@ -89,7 +89,7 @@ struct OnboardingView: View {
                     }
                     
                     Button(action: {
-                        if currentPage < pages.count - 1 {
+                        if currentPage < pageSpecs.count - 1 {
                             withAnimation {
                                 currentPage += 1
                             }
@@ -97,23 +97,29 @@ struct OnboardingView: View {
                             isOnboardingComplete = true
                         }
                     }) {
-                        Text(currentPage < pages.count - 1 ? "İleri" : "Başla")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 1.0, green: 0.7, blue: 0.5),
-                                        Color(red: 1.0, green: 0.5, blue: 0.7)
-                                    ],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
+                        Group {
+                            if currentPage < pageSpecs.count - 1 {
+                                Text("next")
+                            } else {
+                                Text("get_started")
+                            }
+                        }
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 1.0, green: 0.7, blue: 0.5),
+                                    Color(red: 1.0, green: 0.5, blue: 0.7)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
                             )
-                            .cornerRadius(20)
-                            .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+                        )
+                        .cornerRadius(20)
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
                     }
                 }
                 .padding(.horizontal, 30)
@@ -123,15 +129,15 @@ struct OnboardingView: View {
     }
 }
 
-struct OnboardingPage {
-    let title: String
-    let description: String
+struct OnboardingPageSpec {
+    let titleKey: String
+    let bodyKey: String
     let icon: String
     let color: Color
 }
 
 struct OnboardingPageView: View {
-    let page: OnboardingPage
+    let page: OnboardingPageSpec
     @State private var iconScale: CGFloat = 0.8
     @State private var iconRotation: Double = 0
     
@@ -174,12 +180,12 @@ struct OnboardingPageView: View {
             
             // Text content
             VStack(spacing: 20) {
-                Text(page.title)
+                Text(LocalizedStringKey(page.titleKey))
                     .font(.system(size: 36, weight: .bold, design: .rounded))
                     .foregroundColor(Color(red: 0.3, green: 0.2, blue: 0.4))
                     .multilineTextAlignment(.center)
                 
-                Text(page.description)
+                Text(LocalizedStringKey(page.bodyKey))
                     .font(.system(size: 18, weight: .regular, design: .rounded))
                     .foregroundColor(Color(red: 0.5, green: 0.4, blue: 0.6))
                     .multilineTextAlignment(.center)

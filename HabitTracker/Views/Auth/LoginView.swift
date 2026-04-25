@@ -54,11 +54,11 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                         }
                         
-                        Text("HabitTracker")
+                        Text("auth_app_name")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundColor(Color(.label))
                         
-                        Text("Alışkanlıklarınızı takip edin")
+                        Text("auth_app_tagline")
                             .font(.system(size: 16, weight: .regular, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
@@ -67,11 +67,11 @@ struct LoginView: View {
                     VStack(spacing: 20) {
                         // Email Field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("E-posta")
+                            Text("auth_email")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            TextField("ornek@email.com", text: $email)
+                            TextField("auth_email_placeholder", text: $email)
                                 .textContentType(.emailAddress)
                                 .keyboardType(.emailAddress)
                                 .autocapitalization(.none)
@@ -84,7 +84,7 @@ struct LoginView: View {
                                 .focused($focusedField, equals: .email)
 
                             if !email.isEmpty && !isEmailValid {
-                                Text("Geçerli bir e-posta adresi girin")
+                                Text("auth_invalid_email_short")
                                     .font(.system(size: 12, weight: .regular, design: .rounded))
                                     .foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.3))
                             }
@@ -92,11 +92,11 @@ struct LoginView: View {
                         
                         // Password Field
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Şifre")
+                            Text("auth_password")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            SecureField("Şifrenizi girin", text: $password)
+                            SecureField("auth_password_placeholder", text: $password)
                                 .textContentType(.password)
                                 .font(.system(size: 16, design: .rounded))
                                 .padding(16)
@@ -116,7 +116,7 @@ struct LoginView: View {
                                 }
                             }
                         }) {
-                            Text("Giriş Yap")
+                            Text("auth_sign_in")
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -142,14 +142,14 @@ struct LoginView: View {
                     
                     // Sign Up Link
                     HStack {
-                        Text("Hesabınız yok mu?")
+                        Text("auth_no_account")
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                         
                         Button(action: {
                             showSignUp = true
                         }) {
-                            Text("Kayıt Ol")
+                            Text("auth_sign_up")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(red: 0.95, green: 0.7, blue: 0.5))
                         }
@@ -160,10 +160,10 @@ struct LoginView: View {
                 }
             }
         }
-        .alert("Hata", isPresented: $authManager.showError) {
-            Button("Tamam", role: .cancel) { }
+        .alert("error", isPresented: $authManager.showError) {
+            Button("ok", role: .cancel) { }
         } message: {
-            Text(authManager.errorMessage ?? "Bir hata oluştu")
+            Text(authManager.errorMessage ?? NSLocalizedString("auth_error_generic", comment: ""))
         }
         .fullScreenCover(isPresented: $showSignUp) {
             SignUpView(authManager: authManager)

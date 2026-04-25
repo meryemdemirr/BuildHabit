@@ -23,7 +23,7 @@ struct DataManagementView: View {
             
             List {
                 Section {
-                    Text("İşlemler bu cihazda saklanan verileri etkiler. Bazıları geri alınamaz.")
+                    Text("data_footer_note")
                         .font(.system(size: 13, weight: .regular, design: .rounded))
                         .foregroundStyle(Color(.secondaryLabel))
                         .padding(.vertical, 4)
@@ -32,8 +32,8 @@ struct DataManagementView: View {
                 Section {
                     destructiveActionRow(
                         icon: "arrow.counterclockwise.circle.fill",
-                        title: "İlerlemeni Sıfırla",
-                        subtitle: "Tamamlamalar ve seriler sıfırlanır; alışkanlıklar kalır."
+                        title: NSLocalizedString("data_reset_progress_title", comment: ""),
+                        subtitle: NSLocalizedString("data_reset_progress_subtitle", comment: "")
                     ) {
                         confirmResetProgress = true
                     }
@@ -42,8 +42,8 @@ struct DataManagementView: View {
                 Section {
                     destructiveActionRow(
                         icon: "exclamationmark.triangle.fill",
-                        title: "Verileri Sıfırla",
-                        subtitle: "Alışkanlıklar, ilerleme, bildirim ve tema tercihleri sıfırlanır."
+                        title: NSLocalizedString("data_reset_all_title", comment: ""),
+                        subtitle: NSLocalizedString("data_reset_all_subtitle", comment: "")
                     ) {
                         confirmResetAllData = true
                     }
@@ -52,25 +52,25 @@ struct DataManagementView: View {
             .scrollContentBackground(.hidden)
             .listStyle(.insetGrouped)
         }
-        .navigationTitle("Veri Yönetimi")
+        .navigationTitle("settings_data")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Uyarı", isPresented: $confirmResetProgress) {
-            Button("İptal", role: .cancel) {}
-            Button("Sıfırla", role: .destructive) {
+        .alert("warning", isPresented: $confirmResetProgress) {
+            Button("cancel", role: .cancel) {}
+            Button("reset", role: .destructive) {
                 habitManager.resetAllCompletionProgress()
             }
         } message: {
-            Text("Bu işlem geri alınamaz. Emin misin?")
+            Text("data_reset_confirm")
         }
-        .alert("Uyarı", isPresented: $confirmResetAllData) {
-            Button("İptal", role: .cancel) {}
-            Button("Sıfırla", role: .destructive) {
+        .alert("warning", isPresented: $confirmResetAllData) {
+            Button("cancel", role: .cancel) {}
+            Button("reset", role: .destructive) {
                 habitManager.deleteAllHabits()
                 notificationManager.resetEveningReminderPreferences()
                 themeManager.selectedTheme = .light
             }
         } message: {
-            Text("Bu işlem geri alınamaz. Emin misin?")
+            Text("data_reset_confirm")
         }
     }
     

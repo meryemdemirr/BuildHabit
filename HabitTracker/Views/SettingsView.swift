@@ -67,7 +67,7 @@ struct SettingsView: View {
                             showProfile = true
                         }
                     } header: {
-                        Text("Profil")
+                        Text("settings_section_profile")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
@@ -80,8 +80,8 @@ struct SettingsView: View {
                             SettingsRow(
                                 icon: "bell.fill",
                                 iconColor: Color(red: 1.0, green: 0.6, blue: 0.4),
-                                title: "Bildirimler",
-                                subtitle: "Hatırlatmaları yönet",
+                                title: NSLocalizedString("notifications", comment: ""),
+                                subtitle: NSLocalizedString("settings_notifications_subtitle", comment: ""),
                                 showsDisclosure: false
                             )
                         }
@@ -101,11 +101,11 @@ struct SettingsView: View {
                                 }
                                 
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Tema")
+                                    Text("settings_theme")
                                         .font(.system(size: 16, weight: .medium, design: .rounded))
                                         .foregroundColor(Color(.label))
                                     
-                                    Text("Görünüm tercihinizi seçin")
+                                    Text("settings_theme_subtitle")
                                         .font(.system(size: 13, weight: .regular, design: .rounded))
                                         .foregroundColor(Color(.secondaryLabel))
                                 }
@@ -113,9 +113,9 @@ struct SettingsView: View {
                                 Spacer()
                             }
                             
-                            Picker("Tema", selection: $themeManager.selectedTheme) {
+                            Picker("settings_theme_picker_a11y", selection: $themeManager.selectedTheme) {
                                 ForEach(AppTheme.allCases, id: \.self) { theme in
-                                    Text(theme.rawValue).tag(theme)
+                                    Text(theme.localizedTitle).tag(theme)
                                 }
                             }
                             .pickerStyle(.segmented)
@@ -129,14 +129,14 @@ struct SettingsView: View {
                             SettingsRow(
                                 icon: "chart.bar.fill",
                                 iconColor: Color(red: 0.5, green: 0.9, blue: 0.6),
-                                title: "Veri Yönetimi",
-                                subtitle: "Alışkanlık verilerini yönet",
+                                title: NSLocalizedString("settings_data", comment: ""),
+                                subtitle: NSLocalizedString("settings_data_subtitle", comment: ""),
                                 showsDisclosure: false
                             )
                         }
                         .buttonStyle(.plain)
                     } header: {
-                        Text("Ayarlar")
+                        Text("settings_section_settings")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
@@ -146,12 +146,12 @@ struct SettingsView: View {
                         SettingsRow(
                             icon: "info.circle.fill",
                             iconColor: Color(red: 0.6, green: 0.8, blue: 1.0),
-                            title: "Uygulama Hakkında",
-                            subtitle: "Sürüm 1.0",
+                            title: NSLocalizedString("settings_about_app", comment: ""),
+                            subtitle: NSLocalizedString("settings_version_subtitle", comment: ""),
                             showsDisclosure: false
                         )
                     } header: {
-                        Text("Hakkında")
+                        Text("settings_section_about")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
@@ -163,7 +163,7 @@ struct SettingsView: View {
                         }) {
                             HStack {
                                 Spacer()
-                                Text("Çıkış Yap")
+                                Text("settings_sign_out")
                                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                                     .foregroundColor(Color(red: 1.0, green: 0.3, blue: 0.3))
                                 Spacer()
@@ -174,7 +174,7 @@ struct SettingsView: View {
                 .scrollContentBackground(.hidden)
                 .listStyle(.insetGrouped)
         }
-        .navigationTitle("Ayarlar")
+        .navigationTitle("settings")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             if openedFromHome {
@@ -186,12 +186,12 @@ struct SettingsView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 17, weight: .semibold))
-                            Text("Ana Sayfa")
+                            Text("settings_home")
                                 .font(.system(size: 17, weight: .regular))
                         }
                         .foregroundStyle(Color(.label))
                     }
-                    .accessibilityLabel("Ana sayfaya dön")
+                    .accessibilityLabel("settings_back_to_home_a11y")
                 }
             }
         }
@@ -199,13 +199,13 @@ struct SettingsView: View {
             ProfileView()
                 .environmentObject(authManager)
         }
-        .alert("Çıkış Yap", isPresented: $showSignOutAlert) {
-            Button("İptal", role: .cancel) { }
-            Button("Çıkış Yap", role: .destructive) {
+        .alert("settings_sign_out_title", isPresented: $showSignOutAlert) {
+            Button("cancel", role: .cancel) { }
+            Button("settings_sign_out", role: .destructive) {
                 authManager.signOut()
             }
         } message: {
-            Text("Hesabınızdan çıkmak istediğinize emin misiniz?")
+            Text("settings_sign_out_message")
         }
     }
 }
@@ -297,11 +297,11 @@ struct ProfileView: View {
                     Spacer()
                 }
             }
-            .navigationTitle("Profil")
+            .navigationTitle("profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Kapat") {
+                    Button("close") {
                         dismiss()
                     }
                     .foregroundColor(Color(.label))

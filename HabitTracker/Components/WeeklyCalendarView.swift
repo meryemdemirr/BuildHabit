@@ -9,6 +9,13 @@ import SwiftUI
 
 struct WeeklyCalendarView: View {
     @Binding var selectedDate: Date
+
+    private static let shortWeekdayFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = .autoupdatingCurrent
+        f.setLocalizedDateFormatFromTemplate("EEE")
+        return f
+    }()
     
     // Her zaman seçili tarihin haftasını gösterir: Pazartesi -> Pazar
     private var weekDates: [Date] {
@@ -25,15 +32,7 @@ struct WeeklyCalendarView: View {
     }
     
     private func dayName(for date: Date) -> String {
-        switch Calendar.current.component(.weekday, from: date) {
-        case 2: return "Pzt"
-        case 3: return "Sal"
-        case 4: return "Çar"
-        case 5: return "Per"
-        case 6: return "Cum"
-        case 7: return "Cmt"
-        default: return "Paz"
-        }
+        Self.shortWeekdayFormatter.string(from: date)
     }
     
     private func dayNumber(for date: Date) -> String {

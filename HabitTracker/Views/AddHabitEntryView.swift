@@ -10,16 +10,21 @@ import SwiftUI
 struct AddHabitEntryView: View {
     let initialStartDate: Date
     
-    private let categoryOrder: [String] = ["Özbakım", "Aktif Ol", "Daha Sağlıklı Ol", "Öğren"]
+    private let categoryOrderKeys: [String] = [
+        "preset_category_self_care",
+        "preset_category_active",
+        "preset_category_healthier",
+        "preset_category_learn"
+    ]
     
     init(initialStartDate: Date = Date()) {
         self.initialStartDate = Calendar.current.startOfDay(for: initialStartDate)
     }
     
-    private var groupedPresets: [(category: String, presets: [PresetHabitTemplate])] {
-        categoryOrder.compactMap { category in
-            let presets = PresetHabitTemplate.library.filter { $0.category == category }
-            return presets.isEmpty ? nil : (category, presets)
+    private var groupedPresets: [(categoryKey: String, presets: [PresetHabitTemplate])] {
+        categoryOrderKeys.compactMap { key in
+            let presets = PresetHabitTemplate.library.filter { $0.categoryKey == key }
+            return presets.isEmpty ? nil : (key, presets)
         }
     }
     
@@ -36,9 +41,9 @@ struct AddHabitEntryView: View {
                 }
                 .buttonStyle(.plain)
 
-                ForEach(groupedPresets, id: \.category) { group in
+                ForEach(groupedPresets, id: \.categoryKey) { group in
                     VStack(alignment: .leading, spacing: 10) {
-                        Text(group.category)
+                        Text(NSLocalizedString(group.categoryKey, comment: ""))
                             .font(.system(size: 16, weight: .bold, design: .rounded))
                             .foregroundStyle(Color(.secondaryLabel))
                             .padding(.leading, 2)
@@ -62,7 +67,7 @@ struct AddHabitEntryView: View {
             .padding(.bottom, 28)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("Yeni Alışkanlık")
+        .navigationTitle("add_habit_title")
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -77,7 +82,7 @@ struct AddHabitEntryView: View {
                     .foregroundStyle(preset.color.swiftUIColor)
             }
             
-            Text(preset.title)
+            Text(preset.localizedTitle)
                 .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .foregroundStyle(Color(.label))
                 .multilineTextAlignment(.leading)
@@ -110,7 +115,7 @@ struct AddHabitEntryView: View {
                     .foregroundStyle(Color(red: 0.95, green: 0.7, blue: 0.5))
             }
             
-            Text("Kendi alışkanlığını ekle")
+            Text("add_habit_custom")
                 .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .foregroundStyle(Color(.label))
             

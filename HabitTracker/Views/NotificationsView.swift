@@ -29,7 +29,7 @@ struct NotificationsView: View {
                         notificationManager.setRemindersEnabled(newValue, habitManager: habitManager)
                     }
                 )) {
-                    Text("Bildirimleri Aç")
+                    Text("notif_enable_toggle")
                         .font(.system(size: 17, weight: .medium, design: .rounded))
                 }
                 .padding(16)
@@ -38,10 +38,18 @@ struct NotificationsView: View {
                         .fill(Color(.secondarySystemGroupedBackground))
                 )
                 
-                Text("Açıkken, bugün için tamamlanmamış alışkanıkların varsa her gün akşam 18:00–22:00 arasında rastgele bir saatte hatırlatma alırsın.")
+                Text("notif_description")
                     .font(.system(size: 14, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(.secondaryLabel))
                     .fixedSize(horizontal: false, vertical: true)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("reminder_title")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    Text("reminder_body")
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                }
+                .foregroundStyle(Color(.secondaryLabel))
                 
                 if let summary = notificationManager.nextReminderSummary {
                     Text(summary)
@@ -60,7 +68,7 @@ struct NotificationsView: View {
             .padding(.horizontal, 20)
             .padding(.top, 8)
         }
-        .navigationTitle("Bildirimler")
+        .navigationTitle("notifications")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
@@ -69,10 +77,10 @@ struct NotificationsView: View {
         .onReceive(NotificationCenter.default.publisher(for: .habitsDidChange)) { _ in
             notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
         }
-        .alert("Bildirim izni gerekli", isPresented: $notificationManager.showPermissionDeniedAlert) {
-            Button("Tamam", role: .cancel) { }
+        .alert("notif_permission_title", isPresented: $notificationManager.showPermissionDeniedAlert) {
+            Button("ok", role: .cancel) { }
         } message: {
-            Text("Ayarlar > HabitTracker > Bildirimler bölümünden izin verebilirsin.")
+            Text("notif_permission_message")
         }
     }
 }

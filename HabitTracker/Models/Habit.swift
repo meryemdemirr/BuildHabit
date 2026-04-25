@@ -13,6 +13,16 @@ enum HabitFrequency: String, Codable, CaseIterable {
     case daily = "Günlük"
     case weekly = "Haftalık"
     case monthly = "Aylık"
+
+    /// Yerelleştirilmiş etiket (ham `rawValue` Codable uyumluluğu için Türkçe kalır).
+    var localizedTitle: String {
+        switch self {
+        case .none: return NSLocalizedString("frequency_none", comment: "")
+        case .daily: return NSLocalizedString("frequency_daily", comment: "")
+        case .weekly: return NSLocalizedString("frequency_weekly", comment: "")
+        case .monthly: return NSLocalizedString("frequency_monthly", comment: "")
+        }
+    }
 }
 
 struct Habit: Identifiable, Codable {

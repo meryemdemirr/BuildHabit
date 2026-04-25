@@ -51,7 +51,7 @@ class AuthManager: ObservableObject {
         let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard isValidEmail(normalizedEmail) else {
             DispatchQueue.main.async {
-                self.errorMessage = "Geçerli bir e-posta adresi girin (ör. adiniz@gmail.com)."
+                self.errorMessage = NSLocalizedString("auth_error_invalid_email_signup", comment: "")
                 self.showError = true
                 completion(false)
             }
@@ -91,7 +91,7 @@ class AuthManager: ObservableObject {
         let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard isValidEmail(normalizedEmail) else {
             DispatchQueue.main.async {
-                self.errorMessage = "Geçerli bir e-posta adresi girin."
+                self.errorMessage = NSLocalizedString("auth_error_invalid_email_signin", comment: "")
                 self.showError = true
                 completion(false)
             }
@@ -130,7 +130,7 @@ class AuthManager: ObservableObject {
     
     // Get user display name
     var displayName: String {
-        user?.displayName ?? "Kullanıcı"
+        user?.displayName ?? NSLocalizedString("user_display_fallback", comment: "")
     }
     
     // Get user email
@@ -150,6 +150,6 @@ class AuthManager: ObservableObject {
                 return String(first.prefix(1)).uppercased()
             }
         }
-        return "K"
+        return NSLocalizedString("user_initial_fallback", comment: "")
     }
 }

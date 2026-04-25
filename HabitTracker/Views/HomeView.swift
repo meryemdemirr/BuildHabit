@@ -43,7 +43,7 @@ struct HomeView: View {
     
     private var habitsSectionHeader: some View {
         HStack {
-            Text("Alışkanlıklarım")
+            Text("home_my_habits")
                 .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundColor(Color(.label))
             
@@ -77,11 +77,11 @@ struct HomeView: View {
                         VStack(spacing: 24) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Merhaba,")
+                                    Text("home_hello")
                                         .font(.system(size: 28, weight: .bold, design: .rounded))
                                         .foregroundColor(Color(.label))
                                     
-                                    Text("Bugün nasıl gidiyor?")
+                                    Text("home_how_today")
                                         .font(.system(size: 16, weight: .regular, design: .rounded))
                                         .foregroundColor(Color(.secondaryLabel))
                                 }
@@ -101,7 +101,7 @@ struct HomeView: View {
                                         )
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel("Takvimden tarih seç")
+                                .accessibilityLabel("home_pick_date_a11y")
                                 
                                 Button {
                                     openedFromHome = true
@@ -127,20 +127,20 @@ struct HomeView: View {
                                     }
                                 }
                                 .buttonStyle(.plain)
-                                .accessibilityLabel("Ayarları aç")
+                                .accessibilityLabel("home_open_settings_a11y")
                             }
                             .padding(.top, 12)
                             
                             HStack(spacing: 16) {
                                 SummaryCard(
-                                    title: "Toplam Alışkanlık",
+                                    title: NSLocalizedString("home_total_habits", comment: ""),
                                     value: "\(totalHabits)",
                                     icon: "checkmark.circle.fill",
                                     color: Color(red: 0.6, green: 0.8, blue: 1.0)
                                 )
                                 
                                 SummaryCard(
-                                    title: "Aktif Seri",
+                                    title: NSLocalizedString("home_active_streak", comment: ""),
                                     value: "\(activeStreak)",
                                     icon: "flame.fill",
                                     color: Color(red: 1.0, green: 0.6, blue: 0.4)
@@ -170,7 +170,7 @@ struct HomeView: View {
                                     .font(.system(size: 48))
                                     .foregroundColor(Color(.tertiaryLabel))
                                 
-                                Text("Bu tarihte alışkanlık yok")
+                                Text("home_no_habits_this_date")
                                     .font(.system(size: 16, weight: .medium, design: .rounded))
                                     .foregroundColor(Color(.secondaryLabel))
                                 
@@ -178,7 +178,7 @@ struct HomeView: View {
                                     Button(action: {
                                         showAddHabitSheet = true
                                     }) {
-                                        Text("İlk alışkanlığını ekle")
+                                        Text("home_add_first_habit")
                                             .font(.system(size: 16, weight: .semibold, design: .rounded))
                                             .foregroundColor(.white)
                                             .padding(.horizontal, 24)
@@ -235,7 +235,7 @@ struct HomeView: View {
                                         habitPendingDelete = habit
                                         showDeleteConfirmation = true
                                     } label: {
-                                        Label("Sil", systemImage: "trash")
+                                        Label("home_swipe_delete", systemImage: "trash")
                                     }
                                 }
                             }
@@ -259,7 +259,7 @@ struct HomeView: View {
                 if showDateRestrictionToast {
                     VStack {
                         Spacer()
-                        Text("Yalnızca bugünün alışkanlıklarını değiştirebilirsin")
+                        Text("home_today_only_toast")
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
@@ -288,15 +288,15 @@ struct HomeView: View {
             .sheet(isPresented: $showCalendarSheet) {
                 CalendarShortcutSheet(selectedDate: $selectedDate)
             }
-            .alert("Alışkanlığı sil", isPresented: $showDeleteConfirmation) {
-                Button("İptal", role: .cancel) {
+            .alert("home_delete_habit_title", isPresented: $showDeleteConfirmation) {
+                Button("cancel", role: .cancel) {
                     habitPendingDelete = nil
                 }
-                Button("Sil", role: .destructive) {
+                Button("delete", role: .destructive) {
                     performDeletePendingHabit()
                 }
             } message: {
-                Text("Bu alışkanlığı silmek istediğine emin misin?")
+                Text("home_delete_habit_message")
             }
     }
     
@@ -336,7 +336,7 @@ private struct CalendarShortcutSheet: View {
         NavigationStack {
             VStack(spacing: 18) {
                 DatePicker(
-                    "Tarih Seç",
+                    "calendar_date_picker_a11y",
                     selection: $pickerDate,
                     displayedComponents: .date
                 )
@@ -348,13 +348,13 @@ private struct CalendarShortcutSheet: View {
                         .fill(Color(.secondarySystemGroupedBackground))
                 )
 
-                Text("Bir gün seçtiğinde ana ekrana dönülür.")
+                Text("calendar_hint")
                     .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundColor(Color(.secondaryLabel))
             }
             .padding(20)
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Takvim")
+            .navigationTitle("calendar_nav_title")
             .navigationBarTitleDisplayMode(.inline)
             .onChange(of: pickerDate) { _, newDate in
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.82)) {

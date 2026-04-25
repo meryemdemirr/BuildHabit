@@ -30,7 +30,7 @@ struct AddHabitSheet: View {
             _selectedFrequency = State(initialValue: .daily)
             _selectedStartDate = State(initialValue: normalizedInitialDate)
         case .preset(let template):
-            _habitTitle = State(initialValue: template.title)
+            _habitTitle = State(initialValue: template.localizedTitle)
             _habitDescription = State(initialValue: "")
             _selectedColor = State(initialValue: template.color)
             _selectedIcon = State(initialValue: template.icon)
@@ -56,11 +56,11 @@ struct AddHabitSheet: View {
                 Form {
                     Section {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Alışkanlık İsmi")
+                            Text("habit_name_label")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            TextField("Örn: Sabah Egzersizi", text: $habitTitle)
+                            TextField("habit_name_placeholder", text: $habitTitle)
                                 .font(.system(size: 16, design: .rounded))
                                 .padding(12)
                                 .background(
@@ -71,7 +71,7 @@ struct AddHabitSheet: View {
                         .padding(.vertical, 8)
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Açıklama")
+                            Text("habit_description_label")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
@@ -90,14 +90,14 @@ struct AddHabitSheet: View {
                         }
                         .padding(.vertical, 8)
                     } header: {
-                        Text("Bilgiler")
+                        Text("add_section_info")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
                     
                     Section {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Renk Seçimi")
+                            Text("color_pick_label")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
@@ -117,14 +117,14 @@ struct AddHabitSheet: View {
                         }
                         .padding(.vertical, 8)
                     } header: {
-                        Text("Görünüm")
+                        Text("add_section_appearance")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
                     
                     Section {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("İkon Seçimi")
+                            Text("icon_pick_label")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
@@ -136,14 +136,14 @@ struct AddHabitSheet: View {
                         }
                         .padding(.vertical, 8)
                     } header: {
-                        Text("İkon")
+                        Text("add_section_icon")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
                     
                     Section {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Başlangıç Tarihi")
+                            Text("start_date_label")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
@@ -154,20 +154,20 @@ struct AddHabitSheet: View {
                         .padding(.vertical, 8)
                         
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Sıklık")
+                            Text("frequency_label")
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(Color(.label))
                             
-                            Picker("Sıklık", selection: $selectedFrequency) {
+                            Picker("frequency_picker_a11y", selection: $selectedFrequency) {
                                 ForEach(HabitFrequency.allCases, id: \.self) { frequency in
-                                    Text(frequency.rawValue).tag(frequency)
+                                    Text(frequency.localizedTitle).tag(frequency)
                                 }
                             }
                             .pickerStyle(.segmented)
                         }
                         .padding(.vertical, 8)
                     } header: {
-                        Text("Takvim")
+                        Text("add_section_calendar")
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundColor(Color(.secondaryLabel))
                     }
@@ -175,7 +175,7 @@ struct AddHabitSheet: View {
                 .scrollContentBackground(.hidden)
                 .background(Color(.systemGroupedBackground))
         }
-        .navigationTitle("Yeni Alışkanlık")
+        .navigationTitle("add_habit_title")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -187,11 +187,11 @@ struct AddHabitSheet: View {
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundStyle(Color(.label))
                     }
-                    .accessibilityLabel("Geri")
+                    .accessibilityLabel("toolbar_back_a11y")
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Kaydet") {
+                    Button("save") {
                         saveHabit()
                     }
                     .font(.system(size: 16, weight: .semibold, design: .rounded))

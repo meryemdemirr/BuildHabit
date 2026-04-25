@@ -20,7 +20,13 @@ struct StatsView: View {
     private let cellCorner: CGFloat = 2
     private let minHabitColumnWidth: CGFloat = 72
     private let maxHabitColumnWidth: CGFloat = 112
-    private let weekDayLabels: [String] = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"]
+
+    private static let shortWeekdayFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = .autoupdatingCurrent
+        f.setLocalizedDateFormatFromTemplate("EEE")
+        return f
+    }()
     
     private var monthStart: Date {
         let comps = calendar.dateComponents([.year, .month], from: Date())
@@ -31,20 +37,12 @@ struct StatsView: View {
         calendar.range(of: .day, in: .month, for: monthStart)?.count ?? 30
     }
 
-    private var weekRangeTitle: String {
-        guard let firstDay = weekDates.first, let lastDay = weekDates.last else { return "Son 7 Gün" }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "tr_TR")
-        formatter.dateFormat = "d MMM"
-        return "\(formatter.string(from: firstDay)) - \(formatter.string(from: lastDay))"
-    }
-    
     private var matrixStats: (targets: Int, completed: Int, dailyAvgPercent: Int, completionRatio: Double) {
         Self.computeMatrixStats(habits: habits, monthStart: monthStart, daysInMonth: daysInMonth, calendar: calendar)
     }
 
     private var bestStreak: Int {
-        habits.map(\.streak).max() ?? 0
+        habits.map { $0.streak }.max() ?? 0
     }
 
     private var topHabitsByStreak: [Habit] {
@@ -96,7 +94,7 @@ struct StatsView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("ALIŞKANLIKLARIN")
+                    Text("stats_caps_habits")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(.secondaryLabel))
 
@@ -108,7 +106,7 @@ struct StatsView: View {
                     .monospacedDigit()
                     
                     +
-                    Text("alışkanlık")
+                    Text("stats_habit_suffix")
                         .foregroundStyle(Color(.secondaryLabel))
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                 }
@@ -120,7 +118,7 @@ struct StatsView: View {
                 )
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("EN İYİ SERİN")
+                    Text("stats_caps_best_streak")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(.secondaryLabel))
 
@@ -132,7 +130,7 @@ struct StatsView: View {
                     .monospacedDigit()
                     
                     +
-                    Text("gün")
+                    Text("stats_days")
                         .foregroundStyle(Color(.secondaryLabel))
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                 }
@@ -146,7 +144,7 @@ struct StatsView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("EN İYİ ALIŞKANLIKLAR")
+                    Text("stats_top_habits")
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(.secondaryLabel))
 
@@ -155,7 +153,7 @@ struct StatsView: View {
                 }
 
                 if topThreeHabits.isEmpty {
-                    Text("Henüz alışkanlık yok")
+                    Text("stats_no_habits_yet")
                         .font(.system(size: 14, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(.secondaryLabel))
                         .padding(.vertical, 8)
@@ -170,7 +168,7 @@ struct StatsView: View {
 
                             Spacer(minLength: 8)
 
-                            Text("🔥 \(habit.streak)")
+                            Text(String(format: NSLocalizedString("stats_streak_fire", comment: ""), habit.streak))
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(.secondaryLabel))
                                 .monospacedDigit()
@@ -210,7 +208,7 @@ struct StatsView: View {
 
                     HStack(spacing: columnGap) {
                         ForEach(Array(weekDates.enumerated()), id: \.offset) { idx, _ in
-                            Text(weekDayLabels[idx])
+                            Text(Self.shortWeekdayFormatter.string(from: weekDates[idx]))
                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(.secondaryLabel))
                                 .frame(width: dayColumnWidth, height: 16)
@@ -268,16 +266,16 @@ struct StatsView: View {
     private func summaryBlock(stats: (targets: Int, completed: Int, dailyAvgPercent: Int, completionRatio: Double)) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Günlük ortalama")
+                Text("stats_daily_average")
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(.label))
-                Text("%\(stats.dailyAvgPercent) tamamlandı")
+                Text(String(format: NSLocalizedString("stats_percent_complete", comment: ""), stats.dailyAvgPercent))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(.label))
             }
             .padding(.bottom, 2)
             
-            Text("Bu ay \(stats.targets) habitten \(stats.completed)'i tamamlandı")
+            Text(String(format: NSLocalizedString("stats_month_summary", comment: ""), stats.targets, stats.completed))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .foregroundStyle(Color(.secondaryLabel))
         }
@@ -289,9 +287,9 @@ struct StatsView: View {
             Image(systemName: "chart.bar.xaxis")
                 .font(.system(size: 56))
                 .foregroundStyle(Color(.tertiaryLabel))
-            Text("Henüz veri yok")
+            Text("stats_empty_title")
                 .font(.system(size: 17, weight: .semibold, design: .rounded))
-            Text("Alışkanlık eklediğinde aylık matris burada görünecek.")
+            Text("stats_empty_subtitle")
                 .font(.system(size: 14, weight: .regular, design: .rounded))
                 .foregroundStyle(Color(.secondaryLabel))
                 .multilineTextAlignment(.center)

@@ -1,22 +1,193 @@
-"Ana Sayfa" = "Home";
-"İstatistik" = "Statistics";
-"Ayarlar" = "Settings";
-"Ayarları aç" = "Open settings";
-"Ana sayfaya dön" = "Back to Home";
-"İlk alışkanlığını ekle" = "Add your first habit";
-"Kaydet" = "Save";
-"Yeni Alışkanlık" = "New Habit";
-"Alışkanlıklarım" = "My Habits";
-"Merhaba," = "Hello,";
-"Bugün nasıl gidiyor?" = "How is your day going?";
-"Toplam Alışkanlık" = "Total Habits";
-"Aktif Seri" = "Active Streak";
-"Bu tarihte alışkanlık yok" = "No habits on this date";
-"Sil" = "Delete";
-"Alışkanlığı sil" = "Delete Habit";
-"İptal" = "Cancel";
-"Bu alışkanlığı silmek istediğine emin misin?" = "Are you sure you want to delete this habit?";
-"Takvimden tarih seç" = "Select date from calendar";
-"Geri" = "Back";
-"İleri" = "Next";
-"Başla" = "Get Started";
+/* Common */
+"ok" = "OK";
+"cancel" = "Cancel";
+"delete" = "Delete";
+"save" = "Save";
+"close" = "Close";
+"back" = "Back";
+"next" = "Next";
+"get_started" = "Get Started";
+"warning" = "Warning";
+"reset" = "Reset";
+"error" = "Error";
+"settings" = "Settings";
+"profile" = "Profile";
+"about" = "About";
+"calendar" = "Calendar";
+"notifications" = "Notifications";
+"tab_home" = "Home";
+"tab_statistics" = "Statistics";
+"tab_settings" = "Settings";
+
+/* Required reminder keys */
+"reminder_title" = "Reminder";
+"reminder_body" = "Don't forget to complete your habits today!";
+
+/* Splash */
+"splash_tagline" = "Build Better Habits";
+
+/* Home */
+"home_my_habits" = "My Habits";
+"home_hello" = "Hello,";
+"home_how_today" = "How's your day?";
+"home_pick_date_a11y" = "Pick a date on the calendar";
+"home_open_settings_a11y" = "Open settings";
+"home_total_habits" = "Total habits";
+"home_active_streak" = "Active streak";
+"home_no_habits_this_date" = "No habits on this date";
+"home_add_first_habit" = "Add your first habit";
+"home_delete_habit_title" = "Delete habit";
+"home_delete_habit_message" = "Are you sure you want to delete this habit?";
+"home_today_only_toast" = "You can only change today's habits.";
+"home_swipe_delete" = "Delete";
+
+/* Calendar sheet */
+"calendar_date_picker_a11y" = "Pick a date";
+"calendar_hint" = "When you pick a day, you'll return to the home screen.";
+"calendar_nav_title" = "Calendar";
+
+/* Statistics */
+"stats_caps_habits" = "YOUR HABITS";
+"stats_habit_suffix" = "habits";
+"stats_caps_best_streak" = "YOUR BEST STREAK";
+"stats_days" = "days";
+"stats_top_habits" = "TOP HABITS";
+"stats_no_habits_yet" = "No habits yet";
+"stats_daily_average" = "Daily average";
+"stats_percent_complete" = "%d%% completed";
+"stats_month_summary" = "Completed %2$d of %1$d habit targets this month";
+"stats_empty_title" = "No data yet";
+"stats_empty_subtitle" = "When you add habits, the monthly matrix will appear here.";
+"stats_streak_fire" = "🔥 %d";
+
+/* Settings */
+"settings_section_profile" = "Profile";
+"settings_section_settings" = "Settings";
+"settings_section_about" = "About";
+"settings_notifications_subtitle" = "Manage reminders";
+"settings_theme" = "Theme";
+"settings_theme_subtitle" = "Choose your appearance";
+"settings_theme_picker_a11y" = "Theme";
+"settings_data" = "Data management";
+"settings_data_subtitle" = "Manage habit data";
+"settings_about_app" = "About the app";
+"settings_version_subtitle" = "Version 1.0";
+"settings_sign_out" = "Sign Out";
+"settings_sign_out_title" = "Sign Out";
+"settings_sign_out_message" = "Are you sure you want to sign out?";
+"settings_home" = "Home";
+"settings_back_to_home_a11y" = "Go back to home";
+
+/* Notifications screen */
+"notif_enable_toggle" = "Enable notifications";
+"notif_description" = "When on, if you have incomplete habits for today you receive one reminder at a random time between 6:00 PM and 10:00 PM.";
+"notif_permission_title" = "Notifications permission required";
+"notif_permission_message" = "You can allow them in Settings > HabitTracker > Notifications.";
+"notif_next_reminder" = "Next reminder: %@";
+
+/* Notification manager summaries */
+"notif_all_done_evening" = "Nothing left for today; no evening notification will be sent.";
+"notif_schedule_failed" = "Couldn't schedule notification: %@";
+"notif_next_daily_approx" = "Daily reminder around %02d:%02d.";
+"notif_habit_fallback" = "your habit";
+
+/* Data management */
+"data_footer_note" = "These actions affect data stored on this device. Some cannot be undone.";
+"data_reset_progress_title" = "Reset progress";
+"data_reset_progress_subtitle" = "Clears completions and streaks; habits remain.";
+"data_reset_all_title" = "Reset all data";
+"data_reset_all_subtitle" = "Removes habits, progress, notification and theme preferences.";
+"data_reset_confirm" = "This cannot be undone. Are you sure?";
+
+/* Auth */
+"auth_app_name" = "HabitTracker";
+"auth_app_tagline" = "Track your habits";
+"auth_email" = "Email";
+"auth_password" = "Password";
+"auth_name" = "Full name";
+"auth_sign_in" = "Sign In";
+"auth_sign_up" = "Sign Up";
+"auth_no_account" = "Don't have an account?";
+"auth_email_placeholder" = "you@email.com";
+"auth_password_placeholder" = "Enter your password";
+"auth_name_placeholder" = "Your first and last name";
+"auth_password_new_placeholder" = "At least 6 characters";
+"auth_confirm_password_placeholder" = "Re-enter your password";
+"auth_confirm_password_label" = "Confirm password";
+"auth_invalid_email_short" = "Enter a valid email address";
+"auth_invalid_email_signup" = "Enter a valid email (e.g. gmail.com, hotmail.com, outlook.com)";
+"auth_password_min_length" = "Password must be at least 6 characters";
+"auth_password_mismatch" = "Passwords do not match";
+"auth_error_generic" = "Something went wrong";
+"auth_error_invalid_email_signup" = "Enter a valid email address (e.g. name@gmail.com).";
+"auth_error_invalid_email_signin" = "Enter a valid email address.";
+
+/* User display fallbacks */
+"user_display_fallback" = "User";
+"user_initial_fallback" = "U";
+
+/* Add habit */
+"add_habit_title" = "New habit";
+"add_habit_custom" = "Add your own habit";
+"habit_name_label" = "Habit name";
+"habit_name_placeholder" = "e.g. Morning workout";
+"habit_description_label" = "Description";
+"add_section_info" = "Details";
+"add_section_appearance" = "Appearance";
+"add_section_icon" = "Icon";
+"add_section_calendar" = "Schedule";
+"color_pick_label" = "Color";
+"icon_pick_label" = "Icon selection";
+"start_date_label" = "Start date";
+"frequency_label" = "Frequency";
+"frequency_picker_a11y" = "Frequency";
+"toolbar_back_a11y" = "Back";
+
+/* Habit detail */
+"habit_detail_no_notes" = "No description added yet.";
+
+/* Habit card */
+"habit_streak_days" = "%d-day streak";
+
+/* Onboarding */
+"onboarding_page1_title" = "Track your progress";
+"onboarding_page1_body" = "Strengthen your habits day by day with a simple, easy-to-use tracking screen.";
+"onboarding_page2_title" = "Stay motivated";
+"onboarding_page2_body" = "Get gentle reminders, celebrate small wins, and keep your routine enjoyable.";
+"onboarding_page3_title" = "Build consistency";
+"onboarding_page3_body" = "Build streaks and see your habits become a natural part of your life over time.";
+
+/* Theme */
+"theme_light" = "Light";
+"theme_dark" = "Dark";
+"theme_system" = "System";
+
+/* Habit frequency (display) */
+"frequency_none" = "None";
+"frequency_daily" = "Daily";
+"frequency_weekly" = "Weekly";
+"frequency_monthly" = "Monthly";
+
+/* Preset categories */
+"preset_category_self_care" = "Self-care";
+"preset_category_active" = "Get active";
+"preset_category_healthier" = "Get healthier";
+"preset_category_learn" = "Learn";
+
+/* Preset titles */
+"preset_title_shower" = "Take a shower";
+"preset_title_skincare" = "Do skincare";
+"preset_title_haircare" = "Do hair care";
+"preset_title_run" = "Go for a run";
+"preset_title_walk" = "Take a walk";
+"preset_title_dance" = "Dance";
+"preset_title_pilates" = "Do pilates";
+"preset_title_water" = "Drink water";
+"preset_title_fruit" = "Eat fruit";
+"preset_title_healthy_meal" = "Prepare a healthy meal";
+"preset_title_supplements" = "Take supplements";
+"preset_title_sleep_early" = "Sleep early";
+"preset_title_wake_early" = "Wake up early";
+"preset_title_read_book" = "Read a book";
+"preset_title_study" = "Study";
+"preset_title_podcast" = "Listen to a podcast";

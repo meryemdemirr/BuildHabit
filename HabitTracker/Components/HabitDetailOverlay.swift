@@ -16,7 +16,7 @@ struct HabitDetailOverlay: View {
     
     private var descriptionText: String {
         let trimmed = habit.notes?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? "Henüz açıklama eklenmedi." : trimmed
+        return trimmed.isEmpty ? NSLocalizedString("habit_detail_no_notes", comment: "") : trimmed
     }
     
     private var descriptionIsPlaceholder: Bool {
@@ -41,7 +41,7 @@ struct HabitDetailOverlay: View {
                             .foregroundStyle(Color(.secondaryLabel))
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Kapat")
+                    .accessibilityLabel("close")
                 }
                 
                 VStack(alignment: .leading, spacing: 12) {
@@ -58,7 +58,7 @@ struct HabitDetailOverlay: View {
                 .padding(.top, 4)
                 
                 Button(action: dismiss) {
-                    Text("Kapat")
+                    Text("close")
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)

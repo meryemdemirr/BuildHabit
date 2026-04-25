@@ -27,7 +27,7 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
     
     private let timeFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.locale = Locale(identifier: "tr_TR")
+        f.locale = .autoupdatingCurrent
         f.dateStyle = .none
         f.timeStyle = .short
         return f
@@ -144,7 +144,7 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
         let incomplete = habitManager.habitsForDate(today).filter { !habitManager.isCompleted($0, on: today) }
         
         guard !incomplete.isEmpty else {
-            nextReminderSummary = "Bugün tamamlanmayan alışkanlığın yok; akşam bildirimi gönderilmeyecek."
+            nextReminderSummary = NSLocalizedString("notif_all_done_evening", comment: "")
             return
         }
         
@@ -161,9 +161,8 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let content = UNMutableNotificationContent()
-        let reminderText = makeMeaningfulReminderText(incompleteHabits: incomplete)
-        content.title = reminderText.title
-        content.body = reminderText.body
+        content.title = NSLocalizedString("reminder_title", comment: "")
+        content.body = NSLocalizedString("reminder_body", comment: "")
         content.sound = .default
         
         let request = UNNotificationRequest(identifier: Self.eveningReminderIdentifier, content: content, trigger: trigger)
@@ -172,37 +171,27 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
             DispatchQueue.main.async {
                 guard let self else { return }
                 if let error {
-                    self.nextReminderSummary = "Bildirim planlanamadı: \(error.localizedDescription)"
+                    self.nextReminderSummary = String(
+                        format: NSLocalizedString("notif_schedule_failed", comment: ""),
+                        error.localizedDescription
+                    )
                     return
                 }
                 if let next = trigger.nextTriggerDate() {
                     let timeStr = self.timeFormatter.string(from: next)
-                    self.nextReminderSummary = "Sonraki hatırlatma: \(timeStr)"
+                    self.nextReminderSummary = String(
+                        format: NSLocalizedString("notif_next_reminder", comment: ""),
+                        timeStr
+                    )
                 } else {
-                    self.nextReminderSummary = "Her gün saat \(String(format: "%02d:%02d", hour, minute)) civarında hatırlatma."
+                    self.nextReminderSummary = String(
+                        format: NSLocalizedString("notif_next_daily_approx", comment: ""),
+                        hour,
+                        minute
+                    )
                 }
             }
         }
-    }
-
-    private func makeMeaningfulReminderText(incompleteHabits: [Habit]) -> (title: String, body: String) {
-        let firstHabitTitle = incompleteHabits.first?.title ?? "alışkanlığın"
-        if incompleteHabits.count == 1 {
-            let singleMessages = [
-                "Bugün sadece \(firstHabitTitle) kaldı. Tamamlayıp günü güzel kapat.",
-                "\(firstHabitTitle) için küçük bir adım, büyük bir istikrar demek.",
-                "\(firstHabitTitle) tamamlanınca bugünkü hedeflerin bitecek."
-            ]
-            return ("Bugünü tamamlamaya az kaldı", singleMessages.randomElement() ?? "Bugün sadece \(firstHabitTitle) kaldı.")
-        }
-
-        let remainingCount = incompleteHabits.count
-        let multiMessages = [
-            "Bugün \(remainingCount) alışkanlığın kaldı. Birini şimdi tamamlamaya ne dersin?",
-            "\(firstHabitTitle) ile başlayıp kalanları sırayla tamamlayabilirsin.",
-            "Günün bitmeden kalan \(remainingCount) alışkanlığı tamamlayarak serini koru."
-        ]
-        return ("Bugünkü alışkanlıklarını unutma", multiMessages.randomElement() ?? "Bugün tamamlanmayan alışkanlıkların var.")
     }
     
     private func updateSummaryFromPendingList() {
@@ -216,7 +205,10 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
             }
             let timeStr = self.timeFormatter.string(from: next)
             DispatchQueue.main.async {
-                self.nextReminderSummary = "Sonraki hatırlatma: \(timeStr)"
+                self.nextReminderSummary = String(
+                    format: NSLocalizedString("notif_next_reminder", comment: ""),
+                    timeStr
+                )
             }
         }
     }
