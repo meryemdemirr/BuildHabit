@@ -82,7 +82,7 @@
 "notif_enable_toggle" = "Enable notifications";
 "notif_description" = "When on, if you have incomplete habits for today you receive one reminder at a random time between 6:00 PM and 10:00 PM.";
 "notif_permission_title" = "Notifications permission required";
-"notif_permission_message" = "You can allow them in Settings > HabitTracker > Notifications.";
+"notif_permission_message" = "You can allow them in Settings > Habit Steps > Notifications.";
 "notif_next_reminder" = "Next reminder: %@";
 
 /* Notification manager summaries */
@@ -100,7 +100,7 @@
 "data_reset_confirm" = "This cannot be undone. Are you sure?";
 
 /* Auth */
-"auth_app_name" = "HabitTracker";
+"auth_app_name" = "Habit Steps";
 "auth_app_tagline" = "Track your habits";
 "auth_email" = "Email";
 "auth_password" = "Password";

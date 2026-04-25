@@ -82,7 +82,7 @@
 "notif_enable_toggle" = "Bildirimleri Aç";
 "notif_description" = "Açıkken, bugün için tamamlanmamış alışkanıkların varsa her gün akşam 18:00–22:00 arasında rastgele bir saatte hatırlatma alırsın.";
 "notif_permission_title" = "Bildirim izni gerekli";
-"notif_permission_message" = "Ayarlar > HabitTracker > Bildirimler bölümünden izin verebilirsin.";
+"notif_permission_message" = "Ayarlar > Habit Steps > Bildirimler bölümünden izin verebilirsin.";
 "notif_next_reminder" = "Sonraki hatırlatma: %@";
 
 /* Notification manager summaries */
@@ -100,7 +100,7 @@
 "data_reset_confirm" = "Bu işlem geri alınamaz. Emin misin?";
 
 /* Auth */
-"auth_app_name" = "HabitTracker";
+"auth_app_name" = "Habit Steps";
 "auth_app_tagline" = "Alışkanlıklarınızı takip edin";
 "auth_email" = "E-posta";
 "auth_password" = "Şifre";

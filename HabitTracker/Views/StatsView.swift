@@ -20,6 +20,14 @@ struct StatsView: View {
     private let cellCorner: CGFloat = 2
     private let minHabitColumnWidth: CGFloat = 72
     private let maxHabitColumnWidth: CGFloat = 112
+    private let accentGradient = LinearGradient(
+        colors: [
+            Color(red: 1.0, green: 0.62, blue: 0.45),
+            Color(red: 0.97, green: 0.46, blue: 0.68)
+        ],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
 
     private static let shortWeekdayFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -271,7 +279,7 @@ struct StatsView: View {
                     .foregroundStyle(Color(.label))
                 Text(String(format: NSLocalizedString("stats_percent_complete", comment: ""), stats.dailyAvgPercent))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color(.label))
+                    .foregroundStyle(accentGradient)
             }
             .padding(.bottom, 2)
             
@@ -374,6 +382,14 @@ private struct MatrixDayCell: View {
 
 private struct MonthlyProgressRing: View {
     let ratio: Double
+    private let accentGradient = LinearGradient(
+        colors: [
+            Color(red: 1.0, green: 0.62, blue: 0.45),
+            Color(red: 0.97, green: 0.46, blue: 0.68)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
     
     private var percentText: String {
         "\(Int((ratio * 100).rounded()))%"
@@ -388,7 +404,7 @@ private struct MonthlyProgressRing: View {
             Circle()
                 .trim(from: 0, to: CGFloat(min(1, max(0, ratio))))
                 .stroke(
-                    Color.accentColor,
+                    accentGradient,
                     style: StrokeStyle(lineWidth: 7, lineCap: .round)
                 )
                 .frame(width: 78, height: 78)
@@ -397,7 +413,7 @@ private struct MonthlyProgressRing: View {
             Text(percentText)
                 .font(.system(size: 18, weight: .bold, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(Color(.label))
+                .foregroundStyle(accentGradient)
         }
         .frame(width: 78, height: 78)
     }

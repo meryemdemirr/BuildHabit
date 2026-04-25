@@ -10,13 +10,17 @@ import SwiftUI
 @testable import HabitTracker
 
 final class HabitManagerTests: XCTestCase {
+    private let testUserId = "habit-manager-tests-user"
+    private let storageKey = "saved_habits_user_habit-manager-tests-user"
     var habitManager: HabitManager!
     var testHabit: Habit!
     let calendar = Calendar.current
     
     override func setUp() {
         super.setUp()
-        habitManager = HabitManager()
+        UserDefaults.standard.removeObject(forKey: storageKey)
+        habitManager = HabitManager(initialUserId: testUserId)
+        habitManager.deleteAllHabits()
         testHabit = Habit(
             title: "Test Alışkanlık",
             icon: "star.fill",
@@ -28,6 +32,8 @@ final class HabitManagerTests: XCTestCase {
     }
     
     override func tearDown() {
+        habitManager?.deleteAllHabits()
+        UserDefaults.standard.removeObject(forKey: storageKey)
         habitManager = nil
         testHabit = nil
         super.tearDown()
