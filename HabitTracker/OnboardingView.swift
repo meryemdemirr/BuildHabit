@@ -13,20 +13,20 @@ struct OnboardingView: View {
     
     let pages = [
         OnboardingPage(
-            title: "Track Your Progress",
-            description: "Build better habits one day at a time with our beautiful and intuitive tracker",
+            title: "İlerlemeni Takip Et",
+            description: "Sade ve kullanımı kolay takip ekranı ile alışkanlıklarını gün gün güçlendir.",
             icon: "chart.line.uptrend.xyaxis",
             color: Color(red: 1.0, green: 0.7, blue: 0.5)
         ),
         OnboardingPage(
-            title: "Stay Motivated",
-            description: "Get gentle reminders and celebrate your wins with fun achievements",
+            title: "Motivasyonunu Koru",
+            description: "Nazik hatırlatmalar al, küçük başarılarını gör ve düzenini keyifle sürdür.",
             icon: "sparkles",
             color: Color(red: 1.0, green: 0.5, blue: 0.7)
         ),
         OnboardingPage(
-            title: "Build Consistency",
-            description: "Create streaks and watch your habits become second nature",
+            title: "İstikrar Kazan",
+            description: "Seriler oluştur, alışkanlıklarının zamanla hayatının doğal bir parçası olduğunu gör.",
             icon: "flame.fill",
             color: Color(red: 0.7, green: 0.5, blue: 1.0)
         )

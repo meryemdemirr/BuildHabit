@@ -11,6 +11,7 @@ import UIKit
 struct MainTabView: View {
     @EnvironmentObject private var authManager: AuthManager
     @EnvironmentObject private var notificationManager: NotificationManager
+    private let profileAccent = Color(red: 0.95, green: 0.5, blue: 0.7)
     
     @StateObject private var habitManager = HabitManager()
     @State private var selectedTab = 0
@@ -49,7 +50,7 @@ struct MainTabView: View {
         }
         .environmentObject(habitManager)
         .environmentObject(notificationManager)
-        .accentColor(Color(red: 0.95, green: 0.7, blue: 0.5))
+        .accentColor(profileAccent)
         .onChange(of: selectedTab) { _, newValue in
             if newValue != 2 {
                 openedFromHome = false
@@ -80,15 +81,15 @@ struct MainTabView: View {
             
             appearance.stackedLayoutAppearance.selected.iconColor = UIColor(
                 red: 0.95,
-                green: 0.7,
-                blue: 0.5,
+                green: 0.5,
+                blue: 0.7,
                 alpha: 1.0
             )
             appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
                 .foregroundColor: UIColor(
                     red: 0.95,
-                    green: 0.7,
-                    blue: 0.5,
+                    green: 0.5,
+                    blue: 0.7,
                     alpha: 1.0
                 )
             ]

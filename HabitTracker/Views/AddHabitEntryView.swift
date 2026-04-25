@@ -10,25 +10,22 @@ import SwiftUI
 struct AddHabitEntryView: View {
     let initialStartDate: Date
     
+    private let categoryOrder: [String] = ["Özbakım", "Aktif Ol", "Daha Sağlıklı Ol", "Öğren"]
+    
     init(initialStartDate: Date = Date()) {
         self.initialStartDate = Calendar.current.startOfDay(for: initialStartDate)
     }
     
+    private var groupedPresets: [(category: String, presets: [PresetHabitTemplate])] {
+        categoryOrder.compactMap { category in
+            let presets = PresetHabitTemplate.library.filter { $0.category == category }
+            return presets.isEmpty ? nil : (category, presets)
+        }
+    }
+    
     var body: some View {
         ScrollView {
-            VStack(spacing: 12) {
-                ForEach(PresetHabitTemplate.library) { preset in
-                    NavigationLink {
-                        AddHabitSheet(
-                            entryMode: .preset(preset),
-                            initialStartDate: initialStartDate
-                        )
-                    } label: {
-                        presetRow(preset)
-                    }
-                    .buttonStyle(.plain)
-                }
-                
+            VStack(spacing: 18) {
                 NavigationLink {
                     AddHabitSheet(
                         entryMode: .custom,
@@ -38,6 +35,27 @@ struct AddHabitEntryView: View {
                     customAddRow
                 }
                 .buttonStyle(.plain)
+
+                ForEach(groupedPresets, id: \.category) { group in
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(group.category)
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color(.secondaryLabel))
+                            .padding(.leading, 2)
+                        
+                        ForEach(group.presets) { preset in
+                            NavigationLink {
+                                AddHabitSheet(
+                                    entryMode: .preset(preset),
+                                    initialStartDate: initialStartDate
+                                )
+                            } label: {
+                                presetRow(preset)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)

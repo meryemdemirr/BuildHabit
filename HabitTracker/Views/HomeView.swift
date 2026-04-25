@@ -19,6 +19,7 @@ struct HomeView: View {
     @State private var habitPendingDelete: Habit?
     @State private var showDeleteConfirmation = false
     @State private var showCalendarSheet = false
+    @State private var showDateRestrictionToast = false
     
     private var filteredHabits: [Habit] {
         habitManager.habitsForDate(selectedDate)
@@ -26,6 +27,10 @@ struct HomeView: View {
 
     private var isPastSelectedDate: Bool {
         Calendar.current.startOfDay(for: selectedDate) < Calendar.current.startOfDay(for: Date())
+    }
+
+    private var isSelectedDateToday: Bool {
+        Calendar.current.isDate(Calendar.current.startOfDay(for: selectedDate), inSameDayAs: Calendar.current.startOfDay(for: Date()))
     }
     
     var totalHabits: Int {
@@ -208,9 +213,12 @@ struct HomeView: View {
                                 HabitCard(
                                     habit: habit,
                                     selectedDate: selectedDate,
-                                    isInteractionEnabled: !isPastSelectedDate,
+                                    isInteractionEnabled: isSelectedDateToday,
                                     onCompletionToggle: {
                                         _ = habitManager.toggleCompletion(for: habit, on: selectedDate)
+                                    },
+                                    onDisabledCompletionTap: {
+                                        showDateRestrictionFeedback()
                                     },
                                     onDetailTap: {
                                         withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) {
@@ -247,6 +255,24 @@ struct HomeView: View {
                     .transition(.opacity)
                     .zIndex(1)
                 }
+
+                if showDateRestrictionToast {
+                    VStack {
+                        Spacer()
+                        Text("Yalnızca bugünün alışkanlıklarını değiştirebilirsin")
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(Color.black.opacity(0.78))
+                            )
+                            .padding(.bottom, 24)
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    .zIndex(2)
+                }
             }
             .animation(.easeOut(duration: 0.2), value: showDetail)
             .toolbar(.hidden, for: .navigationBar)
@@ -282,6 +308,17 @@ struct HomeView: View {
         }
         habitManager.deleteHabit(habit)
         habitPendingDelete = nil
+    }
+
+    private func showDateRestrictionFeedback() {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showDateRestrictionToast = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showDateRestrictionToast = false
+            }
+        }
     }
 }
 

@@ -9,6 +9,8 @@ import UserNotifications
 
 extension Notification.Name {
     static let habitsDidChange = Notification.Name("com.habittracker.habitsDidChange")
+    static let onboardingDidComplete = Notification.Name("com.habittracker.onboardingDidComplete")
+    static let onboardingDidReset = Notification.Name("com.habittracker.onboardingDidReset")
 }
 
 /// Akşam hatırlatıcıları: UNUserNotificationCenter, 18:00–22:00 arası rastgele günlük tetikleyici.
@@ -159,8 +161,9 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         let content = UNMutableNotificationContent()
-        content.title = "Habit'ini unutma!"
-        content.body = "Bugün henüz tamamlamadığın alışkanlıklar var"
+        let reminderText = makeMeaningfulReminderText(incompleteHabits: incomplete)
+        content.title = reminderText.title
+        content.body = reminderText.body
         content.sound = .default
         
         let request = UNNotificationRequest(identifier: Self.eveningReminderIdentifier, content: content, trigger: trigger)
@@ -180,6 +183,26 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
                 }
             }
         }
+    }
+
+    private func makeMeaningfulReminderText(incompleteHabits: [Habit]) -> (title: String, body: String) {
+        let firstHabitTitle = incompleteHabits.first?.title ?? "alışkanlığın"
+        if incompleteHabits.count == 1 {
+            let singleMessages = [
+                "Bugün sadece \(firstHabitTitle) kaldı. Tamamlayıp günü güzel kapat.",
+                "\(firstHabitTitle) için küçük bir adım, büyük bir istikrar demek.",
+                "\(firstHabitTitle) tamamlanınca bugünkü hedeflerin bitecek."
+            ]
+            return ("Bugünü tamamlamaya az kaldı", singleMessages.randomElement() ?? "Bugün sadece \(firstHabitTitle) kaldı.")
+        }
+
+        let remainingCount = incompleteHabits.count
+        let multiMessages = [
+            "Bugün \(remainingCount) alışkanlığın kaldı. Birini şimdi tamamlamaya ne dersin?",
+            "\(firstHabitTitle) ile başlayıp kalanları sırayla tamamlayabilirsin.",
+            "Günün bitmeden kalan \(remainingCount) alışkanlığı tamamlayarak serini koru."
+        ]
+        return ("Bugünkü alışkanlıklarını unutma", multiMessages.randomElement() ?? "Bugün tamamlanmayan alışkanlıkların var.")
     }
     
     private func updateSummaryFromPendingList() {

@@ -42,6 +42,23 @@ struct StatsView: View {
     private var matrixStats: (targets: Int, completed: Int, dailyAvgPercent: Int, completionRatio: Double) {
         Self.computeMatrixStats(habits: habits, monthStart: monthStart, daysInMonth: daysInMonth, calendar: calendar)
     }
+
+    private var bestStreak: Int {
+        habits.map(\.streak).max() ?? 0
+    }
+
+    private var topHabitsByStreak: [Habit] {
+        habits.sorted { lhs, rhs in
+            if lhs.streak == rhs.streak {
+                return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            }
+            return lhs.streak > rhs.streak
+        }
+    }
+
+    private var topThreeHabits: [Habit] {
+        Array(topHabitsByStreak.filter { $0.streak > 0 }.prefix(3))
+    }
     
     var body: some View {
         NavigationView {
@@ -51,7 +68,7 @@ struct StatsView: View {
                
     ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
-                        headerBlock
+                        topOverviewSection
                         
                         if habits.isEmpty {
                             emptyState
@@ -75,19 +92,100 @@ struct StatsView: View {
         }
     }
     
-    private var headerBlock: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("İstatistikler")
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .foregroundStyle(Color(.label))
-            
-            Text(weekRangeTitle)
-                 .font(.system(size: 17, weight: .semibold, design: .rounded))
-                .foregroundStyle(Color(.secondaryLabel))
+    private var topOverviewSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("ALIŞKANLIKLARIN")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color(.secondaryLabel))
+
+                    (
+                        Text("\(habits.count) ")
+                            .foregroundStyle(Color(.label))
+                    )
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    
+                    +
+                    Text("alışkanlık")
+                        .foregroundStyle(Color(.secondaryLabel))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                }
+                .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color(.secondarySystemGroupedBackground))
+                )
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("EN İYİ SERİN")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color(.secondaryLabel))
+
+                    (
+                        Text("\(bestStreak) ")
+                            .foregroundStyle(Color(.label))
+                    )
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    
+                    +
+                    Text("gün")
+                        .foregroundStyle(Color(.secondaryLabel))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                }
+                .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color(.secondarySystemGroupedBackground))
+                )
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("EN İYİ ALIŞKANLIKLAR")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color(.secondaryLabel))
+
+                    Spacer()
+
+                }
+
+                if topThreeHabits.isEmpty {
+                    Text("Henüz alışkanlık yok")
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(.secondaryLabel))
+                        .padding(.vertical, 8)
+                } else {
+                    ForEach(topThreeHabits) { habit in
+                        HStack(spacing: 10) {
+                            Text(habit.title)
+                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                                .foregroundStyle(Color(.label))
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+
+                            Spacer(minLength: 8)
+
+                            Text("🔥 \(habit.streak)")
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(.secondaryLabel))
+                                .monospacedDigit()
+                        }
+                        .padding(.vertical, 3)
+                    }
+                }
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(.secondarySystemGroupedBackground))
+            )
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 20)
-        .padding(.bottom, 4)
     }
     
     /// Sütunlar = haftanın günleri, satırlar = habit; tek yatay kaydırma.
@@ -201,7 +299,7 @@ struct StatsView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 60)
     }
-    
+
      /// targets = Σ gün başına (o gün takip edilen habit sayısı), completed = Σ (takip + tamamlandı)
     private static func computeMatrixStats(
         habits: [Habit],

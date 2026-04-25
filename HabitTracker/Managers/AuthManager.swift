@@ -15,6 +15,8 @@ class AuthManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var showError = false
     
+    private let onboardingKey = "hasSeenOnboarding"
+    
     init() {
         // Firebase Auth state listener
         Auth.auth().addStateDidChangeListener { [weak self] _, user in
@@ -77,6 +79,8 @@ class AuthManager: ObservableObject {
                 }
                 
                 self?.errorMessage = nil
+                UserDefaults.standard.set(true, forKey: self?.onboardingKey ?? "hasSeenOnboarding")
+                NotificationCenter.default.post(name: .onboardingDidComplete, object: nil)
                 completion(true)
             }
         }
@@ -104,6 +108,8 @@ class AuthManager: ObservableObject {
                 }
                 
                 self?.errorMessage = nil
+                UserDefaults.standard.set(true, forKey: self?.onboardingKey ?? "hasSeenOnboarding")
+                NotificationCenter.default.post(name: .onboardingDidComplete, object: nil)
                 completion(true)
             }
         }
@@ -113,6 +119,7 @@ class AuthManager: ObservableObject {
     func signOut() {
         do {
             try Auth.auth().signOut()
+            UserDefaults.standard.set(false, forKey: onboardingKey)
             isAuthenticated = false
             user = nil
         } catch {

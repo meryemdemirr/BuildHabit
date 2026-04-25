@@ -13,6 +13,8 @@ struct HabitCard: View {
     let isInteractionEnabled: Bool
     /// Tamamlama dairesine basılınca.
     let onCompletionToggle: () -> Void
+    /// Tamamlama bu tarih için kapalıysa kullanıcıya geri bildirim göstermek için tetiklenir.
+    let onDisabledCompletionTap: (() -> Void)?
     /// Kartın sol alanına (başlık/ikon) basılınca — detay.
     let onDetailTap: () -> Void
     @State private var isPressed = false
@@ -61,6 +63,11 @@ struct HabitCard: View {
             
             // Check button - Tarih bazlı tamamlama
             Button(action: {
+                guard isInteractionEnabled else {
+                    onDisabledCompletionTap?()
+                    return
+                }
+
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                     isPressed = true
                     onCompletionToggle()
@@ -91,7 +98,6 @@ struct HabitCard: View {
                     }
                 }
             }
-            .disabled(!isInteractionEnabled)
             .opacity(isInteractionEnabled ? 1.0 : 0.45)
             .scaleEffect(isPressed ? 0.9 : 1.0)
         }
@@ -116,6 +122,7 @@ struct HabitCard: View {
             selectedDate: Date(),
             isInteractionEnabled: true,
             onCompletionToggle: {},
+            onDisabledCompletionTap: nil,
             onDetailTap: {}
         )
     }

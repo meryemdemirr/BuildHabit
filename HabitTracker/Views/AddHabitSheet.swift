@@ -44,7 +44,8 @@ struct AddHabitSheet: View {
         "book.fill", "books.vertical.fill", "figure.run", "figure.walk", "leaf.fill",
         "drop.fill", "sun.max.fill", "alarm.fill", "sparkles", "moon.fill",
         "star.fill", "heart.fill", "flame.fill", "cup.and.saucer.fill",
-        "pills.fill", "bed.double.fill"
+        "pills.fill", "bed.double.fill", "music.note", "figure.cooldown",
+        "headphones", "shower.fill", "fork.knife"
     ]
     
     var body: some View {
