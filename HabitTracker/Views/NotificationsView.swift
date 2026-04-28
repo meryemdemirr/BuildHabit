@@ -10,6 +10,7 @@
 import SwiftUI
 
 struct NotificationsView: View {
+    private let habitsDidChangeNotification = Notification.Name("com.habittracker.habitsDidChange")
 
     @EnvironmentObject private var habitManager: HabitManager
     @EnvironmentObject private var notificationManager: NotificationManager
@@ -74,7 +75,7 @@ struct NotificationsView: View {
             notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
             notificationManager.refreshAuthorizationAndSummary()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .habitsDidChange)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: habitsDidChangeNotification)) { _ in
             notificationManager.rescheduleEveningReminderIfNeeded(habitManager: habitManager)
         }
         .alert("notif_permission_title", isPresented: $notificationManager.showPermissionDeniedAlert) {

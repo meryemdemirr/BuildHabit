@@ -13,8 +13,11 @@ struct SettingsView: View {
     
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var habitManager: HabitManager
+    @EnvironmentObject var notificationManager: NotificationManager
     @State private var showProfile = false
     @State private var showSignOutAlert = false
+    @State private var showDeleteAccountAlert = false
     
     var body: some View {
         ZStack {
@@ -169,6 +172,22 @@ struct SettingsView: View {
                                 Spacer()
                             }
                         }
+                        .disabled(authManager.isDeletingAccount)
+                    }
+
+                    // Hesabı Sil
+                    Section {
+                        Button(role: .destructive) {
+                            showDeleteAccountAlert = true
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Text("settings_delete_account")
+                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                Spacer()
+                            }
+                        }
+                        .disabled(authManager.isDeletingAccount)
                     }
                 }
                 .scrollContentBackground(.hidden)
@@ -206,6 +225,33 @@ struct SettingsView: View {
             }
         } message: {
             Text("settings_sign_out_message")
+        }
+        .alert("settings_delete_account_title", isPresented: $showDeleteAccountAlert) {
+            Button("cancel", role: .cancel) { }
+            Button("settings_delete_account_confirm", role: .destructive) {
+                authManager.deleteAccount { isSuccess in
+                    guard isSuccess else { return }
+                    habitManager.deleteAllHabits()
+                    notificationManager.resetEveningReminderPreferences()
+                    themeManager.selectedTheme = .light
+                }
+            }
+        } message: {
+            Text("settings_delete_account_message")
+        }
+        .overlay {
+            if authManager.isDeletingAccount {
+                ZStack {
+                    Color.black.opacity(0.15)
+                        .ignoresSafeArea()
+                    ProgressView("settings_delete_account_loading")
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color(.systemBackground))
+                        )
+                }
+            }
         }
     }
 }

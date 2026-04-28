@@ -75,6 +75,13 @@
 "settings_sign_out" = "Çıkış Yap";
 "settings_sign_out_title" = "Çıkış Yap";
 "settings_sign_out_message" = "Hesabınızdan çıkmak istediğinize emin misiniz?";
+"settings_delete_account" = "Hesabımı Sil";
+"settings_delete_account_title" = "Hesabı Sil";
+"settings_delete_account_message" = "Hesabın ve Firebase'deki verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misin?";
+"settings_delete_account_confirm" = "Hesabı Sil";
+"settings_delete_account_loading" = "Hesap siliniyor...";
+"settings_delete_account_error_generic" = "Hesap silinirken bir hata oluştu. Lütfen tekrar deneyin.";
+"settings_delete_account_requires_recent_login" = "Güvenlik nedeniyle hesabı silmek için yeniden giriş yapman gerekiyor.";
 "settings_home" = "Ana Sayfa";
 "settings_back_to_home_a11y" = "Ana sayfaya dön";
 

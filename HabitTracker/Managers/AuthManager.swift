@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 import SwiftUI
 
 class AuthManager: ObservableObject {
@@ -14,6 +15,7 @@ class AuthManager: ObservableObject {
     @Published var isAuthenticated = false
     @Published var errorMessage: String?
     @Published var showError = false
+    @Published var isDeletingAccount = false
     
     private let onboardingKey = "hasSeenOnboarding"
     
@@ -126,6 +128,68 @@ class AuthManager: ObservableObject {
             errorMessage = error.localizedDescription
             showError = true
         }
+    }
+
+    // Delete account and associated cloud data
+    func deleteAccount(completion: @escaping (Bool) -> Void) {
+        guard let currentUser = Auth.auth().currentUser else {
+            DispatchQueue.main.async {
+                completion(false)
+            }
+            return
+        }
+
+        isDeletingAccount = true
+
+        Task {
+            do {
+                try await deleteFirestoreData(for: currentUser.uid)
+                try await currentUser.delete()
+
+                await MainActor.run {
+                    UserDefaults.standard.set(false, forKey: onboardingKey)
+                    isAuthenticated = false
+                    user = nil
+                    errorMessage = nil
+                    isDeletingAccount = false
+                    completion(true)
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = localizedDeleteAccountError(from: error)
+                    showError = true
+                    isDeletingAccount = false
+                    completion(false)
+                }
+            }
+        }
+    }
+
+    private func deleteFirestoreData(for userId: String) async throws {
+        let db = Firestore.firestore()
+
+        // Common document-based profile location
+        try await db.collection("users").document(userId).delete()
+
+        // Common user-scoped data collection for habits
+        let habitsSnapshot = try await db.collection("habits")
+            .whereField("userId", isEqualTo: userId)
+            .getDocuments()
+
+        if !habitsSnapshot.documents.isEmpty {
+            let batch = db.batch()
+            habitsSnapshot.documents.forEach { batch.deleteDocument($0.reference) }
+            try await batch.commit()
+        }
+    }
+
+    private func localizedDeleteAccountError(from error: Error) -> String {
+        if let authError = error as NSError?,
+           authError.domain == AuthErrorDomain,
+           authError.code == AuthErrorCode.requiresRecentLogin.rawValue {
+            return NSLocalizedString("settings_delete_account_requires_recent_login", comment: "")
+        }
+        return NSLocalizedString("settings_delete_account_error_generic", comment: "")
     }
     
     // Get user display name
