@@ -207,7 +207,6 @@ struct StatsView: View {
             let maxHabitWidthByLayout = max(0, availableWidth - fixedGridWidth - nameToGridSpacing)
             let desiredHabitWidth = min(maxHabitColumnWidth, max(minHabitColumnWidth, estimatedTitleWidth + 8))
             let habitColumnWidth = min(desiredHabitWidth, maxHabitWidthByLayout)
-            let contentWidth = habitColumnWidth + nameToGridSpacing + fixedGridWidth
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .center, spacing: nameToGridSpacing) {

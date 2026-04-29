@@ -10,18 +10,48 @@ import FirebaseAuth
 import FirebaseFirestore
 import SwiftUI
 
+/// Firestore'da kullanıcı profil dokümanı (`users/{uid}`) oluşturma/ensure işlemleri.
+/// Not: Bu sınıfı ayrı dosya yerine bu dosyaya almak, Xcode projesine otomatik
+/// eklenmeyen yeni dosya yüzünden çıkabilecek derleme hatalarını önler.
+final class FirestoreUserService {
+    private let db: Firestore
+
+    init(db: Firestore = Firestore.firestore()) {
+        self.db = db
+    }
+
+    /// `users/{uid}` dokümanı yoksa oluşturur.
+    /// İdempotent: doküman zaten varsa tekrar yazmaz (createdAt güncellenmez).
+    func createUserDocumentIfNeeded(userId uid: String, email: String?) async throws {
+        let ref = db.collection("users").document(uid)
+        let snapshot = try await ref.getDocument()
+        guard !snapshot.exists else { return }
+
+        try await ref.setData(
+            [
+                "userId": uid,
+                "email": email ?? "",
+                "createdAt": FieldValue.serverTimestamp()
+            ],
+            merge: false
+        )
+    }
+}
+
 class AuthManager: ObservableObject {
     @Published var user: FirebaseAuth.User?
     @Published var isAuthenticated = false
     @Published var errorMessage: String?
     @Published var showError = false
-    @Published var isDeletingAccount = false
-    
+
+    private static let onboardingDidCompleteNotification = Notification.Name("com.habittracker.onboardingDidComplete")
+
     private let onboardingKey = "hasSeenOnboarding"
+    private let userService = FirestoreUserService()
     
     init() {
         // Firebase Auth state listener
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             DispatchQueue.main.async {
                 self?.user = user
                 self?.isAuthenticated = user != nil
@@ -82,8 +112,29 @@ class AuthManager: ObservableObject {
                 
                 self?.errorMessage = nil
                 UserDefaults.standard.set(true, forKey: self?.onboardingKey ?? "hasSeenOnboarding")
-                NotificationCenter.default.post(name: .onboardingDidComplete, object: nil)
-                completion(true)
+                NotificationCenter.default.post(name: Self.onboardingDidCompleteNotification, object: nil)
+                
+                // Ensure Firestore user profile exists.
+                if let uid = result?.user.uid {
+                    Task { [weak self] in
+                        guard let self else {
+                            await MainActor.run { completion(false) }
+                            return
+                        }
+                        do {
+                            try await self.userService.createUserDocumentIfNeeded(userId: uid, email: result?.user.email)
+                            await MainActor.run { completion(true) }
+                        } catch {
+                            await MainActor.run {
+                                self.errorMessage = error.localizedDescription
+                                self.showError = true
+                                completion(false)
+                            }
+                        }
+                    }
+                } else {
+                    completion(true)
+                }
             }
         }
     }
@@ -111,8 +162,29 @@ class AuthManager: ObservableObject {
                 
                 self?.errorMessage = nil
                 UserDefaults.standard.set(true, forKey: self?.onboardingKey ?? "hasSeenOnboarding")
-                NotificationCenter.default.post(name: .onboardingDidComplete, object: nil)
-                completion(true)
+                NotificationCenter.default.post(name: Self.onboardingDidCompleteNotification, object: nil)
+                
+                // Ensure Firestore user profile exists.
+                if let uid = result?.user.uid {
+                    Task { [weak self] in
+                        guard let self else {
+                            await MainActor.run { completion(false) }
+                            return
+                        }
+                        do {
+                            try await self.userService.createUserDocumentIfNeeded(userId: uid, email: result?.user.email)
+                            await MainActor.run { completion(true) }
+                        } catch {
+                            await MainActor.run {
+                                self.errorMessage = error.localizedDescription
+                                self.showError = true
+                                completion(false)
+                            }
+                        }
+                    }
+                } else {
+                    completion(true)
+                }
             }
         }
     }
@@ -139,27 +211,27 @@ class AuthManager: ObservableObject {
             return
         }
 
-        isDeletingAccount = true
+        let userId = currentUser.uid
+        UserDefaults.standard.set(false, forKey: onboardingKey)
+        isAuthenticated = false
+        user = nil
+        errorMessage = nil
+        completion(true)
 
         Task {
             do {
-                try await deleteFirestoreData(for: currentUser.uid)
-                try await currentUser.delete()
+                try await deleteFirestoreData(for: userId)
+            } catch {
+                // Firestore cleanup should not block account deletion.
+                print("Firestore cleanup failed during account deletion: \(error.localizedDescription)")
+            }
 
-                await MainActor.run {
-                    UserDefaults.standard.set(false, forKey: onboardingKey)
-                    isAuthenticated = false
-                    user = nil
-                    errorMessage = nil
-                    isDeletingAccount = false
-                    completion(true)
-                }
+            do {
+                try await currentUser.delete()
             } catch {
                 await MainActor.run {
                     errorMessage = localizedDeleteAccountError(from: error)
                     showError = true
-                    isDeletingAccount = false
-                    completion(false)
                 }
             }
         }

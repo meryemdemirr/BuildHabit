@@ -172,7 +172,6 @@ struct SettingsView: View {
                                 Spacer()
                             }
                         }
-                        .disabled(authManager.isDeletingAccount)
                     }
 
                     // Hesabı Sil
@@ -187,7 +186,6 @@ struct SettingsView: View {
                                 Spacer()
                             }
                         }
-                        .disabled(authManager.isDeletingAccount)
                     }
                 }
                 .scrollContentBackground(.hidden)
@@ -238,20 +236,6 @@ struct SettingsView: View {
             }
         } message: {
             Text("settings_delete_account_message")
-        }
-        .overlay {
-            if authManager.isDeletingAccount {
-                ZStack {
-                    Color.black.opacity(0.15)
-                        .ignoresSafeArea()
-                    ProgressView("settings_delete_account_loading")
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(Color(.systemBackground))
-                        )
-                }
-            }
         }
     }
 }

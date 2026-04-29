@@ -77,7 +77,7 @@
 "settings_sign_out_message" = "Are you sure you want to sign out?";
 "settings_delete_account" = "Delete My Account";
 "settings_delete_account_title" = "Delete Account";
-"settings_delete_account_message" = "Your account and related Firebase data will be permanently deleted. This action cannot be undone. Are you sure?";
+"settings_delete_account_message" = "Are you sure you want to delete your account?";
 "settings_delete_account_confirm" = "Delete Account";
 "settings_delete_account_loading" = "Deleting account...";
 "settings_delete_account_error_generic" = "Something went wrong while deleting your account. Please try again.";

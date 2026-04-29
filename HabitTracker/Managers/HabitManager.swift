@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 import SwiftUI
 
 class HabitManager: ObservableObject {
@@ -45,14 +46,20 @@ class HabitManager: ObservableObject {
     
     /// Tek bir alışkanlığı kaldırır (yerel depolama).
     func deleteHabit(_ habit: Habit) {
+        let deletedHabitId = habit.id.uuidString
+        let deletedUserId = currentUserId
         habits.removeAll { $0.id == habit.id }
         saveHabits()
+        syncDeleteHabitFromFirestore(habitId: deletedHabitId, userId: deletedUserId)
     }
     
     /// Aktif kullanıcının tüm alışkanlıklarını kaldırır.
     func deleteAllHabits() {
+        let deletedHabitIds = habits.map { $0.id.uuidString }
+        let deletedUserId = currentUserId
         habits.removeAll()
         saveHabits()
+        syncDeleteAllHabitsFromFirestore(habitIds: deletedHabitIds, userId: deletedUserId)
     }
     
     /// Tamamlama geçmişi ve serileri sıfırlanır; alışkanlık tanımları (sıklık, planlı günler vb.) kalır.
@@ -198,5 +205,67 @@ class HabitManager: ObservableObject {
         }
         habits = []
         NotificationCenter.default.post(name: .habitsDidChange, object: nil)
+    }
+
+    private func syncDeleteHabitFromFirestore(habitId: String, userId: String?) {
+        guard let userId else { return }
+        Task {
+            do {
+                let db = Firestore.firestore()
+                try await db.collection("users")
+                    .document(userId)
+                    .collection("habits")
+                    .document(habitId)
+                    .delete()
+
+                try await db.collection("habits").document(habitId).delete()
+
+                let snapshot = try await db.collection("habits")
+                    .whereField("userId", isEqualTo: userId)
+                    .whereField("id", isEqualTo: habitId)
+                    .getDocuments()
+                if !snapshot.documents.isEmpty {
+                    let batch = db.batch()
+                    snapshot.documents.forEach { batch.deleteDocument($0.reference) }
+                    try await batch.commit()
+                }
+            } catch {
+                print("Failed to sync habit deletion to Firestore: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func syncDeleteAllHabitsFromFirestore(habitIds: [String], userId: String?) {
+        guard let userId else { return }
+        Task {
+            do {
+                let db = Firestore.firestore()
+                let rootHabitsSnapshot = try await db.collection("habits")
+                    .whereField("userId", isEqualTo: userId)
+                    .getDocuments()
+                if !rootHabitsSnapshot.documents.isEmpty {
+                    let batch = db.batch()
+                    rootHabitsSnapshot.documents.forEach { batch.deleteDocument($0.reference) }
+                    try await batch.commit()
+                }
+
+                if !habitIds.isEmpty {
+                    let batch = db.batch()
+                    for habitId in habitIds {
+                        let scopedRef = db.collection("users")
+                            .document(userId)
+                            .collection("habits")
+                            .document(habitId)
+                        batch.deleteDocument(scopedRef)
+
+                        let rootRef = db.collection("habits").document(habitId)
+                        batch.deleteDocument(rootRef)
+                    }
+                    try await batch.commit()
+                }
+            } catch {
+                print("Failed to sync delete-all to Firestore: \(error.localizedDescription)")
+            }
+        }
     }
 }

@@ -77,7 +77,7 @@
 "settings_sign_out_message" = "Hesabınızdan çıkmak istediğinize emin misiniz?";
 "settings_delete_account" = "Hesabımı Sil";
 "settings_delete_account_title" = "Hesabı Sil";
-"settings_delete_account_message" = "Hesabın ve Firebase'deki verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misin?";
+"settings_delete_account_message" = "Hesabınızı silmek istediğinizden emin misiniz?";
 "settings_delete_account_confirm" = "Hesabı Sil";
 "settings_delete_account_loading" = "Hesap siliniyor...";
 "settings_delete_account_error_generic" = "Hesap silinirken bir hata oluştu. Lütfen tekrar deneyin.";
